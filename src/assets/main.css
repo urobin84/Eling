@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Roboto:wght@400;500&family=Outfit:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  /* Light Mode (Siang/Fokus - Kejujuran Batin) */
+  body {
+    @apply font-body antialiased transition-colors duration-300;
+    background: linear-gradient(135deg, #F8FAFD 0%, #EDF2FA 100%);
+    color: #1F1F1F;
+  }
+
+  /* Dark Mode (Malam/Tenang - Refleksi Diri & Kedalaman Spiritual) */
+  html.dark body {
+    background: linear-gradient(135deg, #131314 0%, #1E1F20 100%);
+    color: #E3E3E3;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans;
+  }
+
+  /* Light mode: Bold untuk tegas */
+  h1,
+  h2,
+  h3 {
+    @apply font-bold;
+  }
+
+  /* Dark mode: Medium agar tidak silau */
+  html.dark h1,
+  html.dark h2,
+  html.dark h3 {
+    @apply font-semibold;
+  }
+}
+
+@layer components {
+
+  /* Glassmorphism - The Floating Dashboard */
+  .glass-panel {
+    @apply backdrop-blur-glass border rounded-3xl shadow-xl transition-all duration-300;
+
+    /* Light mode: Opasitas putih 70% */
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(31, 31, 31, 0.05);
+  }
+
+  html.dark .glass-panel {
+    /* Dark mode: Opasitas hitam 60% */
+    background: rgba(30, 31, 32, 0.6);
+    border-color: rgba(227, 227, 227, 0.1);
+  }
+
+  /* Neumorphic Button with Gemini Gradient */
+  .btn-neumorphic {
+    @apply font-sans font-bold py-2 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 active:scale-95;
+    background: linear-gradient(135deg, #10B981 0%, #4285F4 100%);
+    color: white;
+  }
+
+  .btn-neumorphic:hover {
+    background: linear-gradient(135deg, #10B981 0%, #4285F4 50%, #A142F4 100%);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Input with Glass Effect */
+  .input-glass {
+    @apply rounded-xl px-4 py-2 focus:outline-none focus:ring-2 transition-all;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(31, 31, 31, 0.1);
+    color: #1F1F1F;
+  }
+
+  .input-glass:focus {
+    @apply ring-eling-emerald border-transparent;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+  }
+
+  html.dark .input-glass {
+    background: rgba(30, 31, 32, 0.5);
+    border-color: rgba(227, 227, 227, 0.1);
+    color: #E3E3E3;
+  }
+
+  html.dark .input-glass::placeholder {
+    color: rgba(227, 227, 227, 0.5);
+  }
+
+  /* Bento Box Card (Kotak Soal) */
+  .bento-card {
+    @apply rounded-3xl p-6 transition-all duration-300 hover:scale-[1.02];
+    background: #FFFFFF;
+    border: 1px solid rgba(31, 31, 31, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  html.dark .bento-card {
+    background: #1E1F20;
+    border-color: rgba(227, 227, 227, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .bento-card:hover {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.15);
+  }
+
+  /* Eling Glow Effect (untuk indikator fokus) */
+  .eling-glow {
+    position: relative;
+  }
+
+  .eling-glow::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(135deg, #10B981 0%, #4285F4 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .eling-glow:hover::after,
+  .eling-glow.active::after {
+    opacity: 1;
+  }
+
+  /* Camera Indicator (Surveillance) */
+  .camera-indicator {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-full transition-all;
+  }
+
+  /* Light mode: Kapsul putih dengan bayangan */
+  .camera-indicator {
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .camera-indicator .dot {
+    @apply w-2 h-2 rounded-full bg-eling-emerald;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  }
+
+  /* Dark mode: Outer glow hijau emerald (neon effect) */
+  html.dark .camera-indicator {
+    background: #2C2D2E;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+  }
+
+  html.dark .camera-indicator .dot {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+  }
+
+  html.dark .camera-indicator .text {
+    color: #10B981;
+    text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+}
