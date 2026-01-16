@@ -6,17 +6,21 @@
 
 @layer base {
 
-  /* Light Mode (Siang/Fokus - Kejujuran Batin) */
+  /* Light Mode (Siang/Fokus - Kejujuran Batin) - SOFT & BRIGHT */
   body {
     @apply font-sans antialiased transition-colors duration-300;
-    background: linear-gradient(135deg, #F8FAFD 0%, #EDF2FA 100%);
-    color: #1F1F1F;
+    /* Very light, soft gradient - like Gemini */
+    background: linear-gradient(135deg, #FAFBFC 0%, #F4F6F8 100%);
+    color: #202124;
+    /* Soft dark gray, not pure black */
   }
 
-  /* Dark Mode (Malam/Tenang - Refleksi Diri & Kedalaman Spiritual) */
+  /* Dark Mode (Malam/Tenang - Refleksi Diri) - SOFT & MUTED */
   html.dark body {
-    background: linear-gradient(135deg, #131314 0%, #1E1F20 100%);
-    color: #E3E3E3;
+    /* Soft dark, not pure black - like Gemini dark mode */
+    background: linear-gradient(135deg, #1F1F1F 0%, #2A2A2A 100%);
+    color: #E8EAED;
+    /* Soft white, not pure white */
   }
 
   h1,
@@ -28,18 +32,18 @@
     @apply font-sans;
   }
 
-  /* Light mode: Bold untuk tegas */
+  /* Light mode: Semibold untuk tidak terlalu tegas */
   h1,
   h2,
   h3 {
-    @apply font-bold;
+    @apply font-semibold;
   }
 
   /* Dark mode: Medium agar tidak silau */
   html.dark h1,
   html.dark h2,
   html.dark h3 {
-    @apply font-semibold;
+    @apply font-medium;
   }
 }
 

@@ -189,57 +189,88 @@ onMounted(fetchData);
     >
         <!-- Dashboard View -->
         <div v-if="currentView === 'dashboard'" class="space-y-6">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Dashboard Overview</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">System performance and operational metrics.</p>
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard Overview</h2>
+                    <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">System performance and operational metrics.</p>
+                </div>
+                <span class="text-xs font-mono text-eling-emerald/70 border border-eling-emerald/20 px-2 py-1 rounded">
+                    SYSTEM STATUS: ONLINE
+                </span>
             </div>
 
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="glass-panel p-4 border-l-4 border-l-blue-500">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase">Candidates</h3>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-                        {{ users.filter(u => u.role !== 'admin').length }}
+            <!-- Stats Cards (Gemini Design) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Candidates Card -->
+                <div class="glass-panel p-6 border-l-4 border-l-blue-500 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
                     </div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-300/70 uppercase tracking-wider">Total Candidates</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span class="text-4xl font-bold text-gray-900 dark:text-white">{{ users.filter(u => u.role !== 'admin').length }}</span>
+                        <span class="ml-2 text-sm text-gray-900 dark:text-gray-300/40">Registered</span>
+                    </div>
+                    <div class="mt-4 text-xs text-blue-300 bg-blue-500/10 inline-block px-2 py-1 rounded">Active Personnel</div>
                 </div>
-                <div class="glass-panel p-4 border-l-4 border-l-green-500">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase">Events</h3>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ events.length }}</div>
+
+                <!-- Schedule Card -->
+                <div class="glass-panel p-6 border-l-4 border-l-green-500 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-300/70 uppercase tracking-wider">Active Schedules</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span class="text-4xl font-bold text-gray-900 dark:text-white">{{ events.length }}</span>
+                        <span class="ml-2 text-sm text-gray-900 dark:text-gray-300/40">Events</span>
+                    </div>
+                    <div class="mt-4 text-xs text-green-300 bg-green-500/10 inline-block px-2 py-1 rounded">Upcoming Sessions</div>
                 </div>
-                <div class="glass-panel p-4 border-l-4 border-l-orange-500">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase">Completed</h3>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">128</div>
-                </div>
-                <div class="glass-panel p-4 border-l-4 border-l-purple-500">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase">Tools</h3>
-                    <div class="text-2xl font-bold text-gray-900 dark:text-white mt-1">{{ tools.length }}</div>
+
+                <!-- Tools Card -->
+                <div class="glass-panel p-6 border-l-4 border-l-purple-500 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-300/70 uppercase tracking-wider">Master Tools</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <span class="text-4xl font-bold text-gray-900 dark:text-white">{{ tools.length }}</span>
+                        <span class="ml-2 text-sm text-gray-900 dark:text-gray-300/40">Available</span>
+                    </div>
+                    <div class="mt-4 text-xs text-purple-300 bg-purple-500/10 inline-block px-2 py-1 rounded">Psychological Library</div>
                 </div>
             </div>
 
             <!-- Quick Actions -->
             <div class="glass-panel p-5">
-                <h3 class="text-xs font-bold text-gray-900 dark:text-eling-dark-text uppercase tracking-wider mb-3">Quick Actions</h3>
+                <h3 class="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">Quick Actions</h3>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <BaseButton size="md" @click="showCreateEventModal = true">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         New Event
                     </BaseButton>
                     <BaseButton size="md" @click="showAddUserModal = true">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                         </svg>
                         Add User
                     </BaseButton>
                     <BaseButton size="md" @click="currentView = 'results'">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Reports
                     </BaseButton>
                     <BaseButton size="md" @click="currentView = 'profile'">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         </svg>
                         Settings
@@ -251,8 +282,8 @@ onMounted(fetchData);
         <!-- Candidates View -->
         <div v-else-if="currentView === 'candidates'">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Candidate Management</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Search, filter, and manage registered candidates.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Candidate Management</h2>
+                <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">Search, filter, and manage registered candidates.</p>
             </div>
             <CandidateList :users="users" @refresh="fetchData" />
         </div>
@@ -260,8 +291,8 @@ onMounted(fetchData);
         <!-- Schedule View -->
         <div v-else-if="currentView === 'schedule'">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Assessment Schedule</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Manage testing sessions and timelines.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Assessment Schedule</h2>
+                <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">Manage testing sessions and timelines.</p>
             </div>
             <ScheduleList 
                 :events="events" 
@@ -275,8 +306,8 @@ onMounted(fetchData);
         <!-- Test Results View -->
         <div v-else-if="currentView === 'results'">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Test Results</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">View and manage candidate assessment results.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Test Results</h2>
+                <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">View and manage candidate assessment results.</p>
             </div>
             <TestResults />
         </div>
@@ -284,8 +315,8 @@ onMounted(fetchData);
         <!-- Profile View -->
         <div v-else-if="currentView === 'profile'">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Profile Settings</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Manage your account settings and preferences.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Profile Settings</h2>
+                <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">Manage your account settings and preferences.</p>
             </div>
             <ProfileSettings />
         </div>
@@ -298,8 +329,8 @@ onMounted(fetchData);
         <!-- User Management View -->
         <div v-else-if="currentView === 'user_management'">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">User Management</h2>
-                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Manage system administrators, proctors, and other users.</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h2>
+                <p class="text-sm text-gray-900 dark:text-gray-300/50 mt-1">Manage system administrators, proctors, and other users.</p>
             </div>
             <UserManagement :users="users" @refresh="fetchData" />
         </div>
@@ -317,8 +348,8 @@ onMounted(fetchData);
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-eling-dark-text mb-2">Are you sure?</h3>
-                <p class="text-sm text-gray-600 dark:text-eling-dark-text/70">You will be signed out of your account.</p>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">Are you sure?</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300/70">You will be signed out of your account.</p>
             </div>
             <template #footer>
                 <div class="flex gap-3">

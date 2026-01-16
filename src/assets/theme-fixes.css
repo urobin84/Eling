@@ -1,0 +1,65 @@
+/* ELING Theme Contrast Fixes - Gemini Style */
+
+/* Sidebar Navigation Items */
+.sidebar-nav-item {
+    @apply text-gray-700 dark:text-gray-300;
+}
+
+.sidebar-nav-item.active {
+    @apply bg-eling-emerald/10 text-eling-emerald font-medium;
+}
+
+.sidebar-nav-item:hover {
+    @apply bg-gray-100 dark:bg-gray-700;
+}
+
+/* Card Text Readability */
+.card-title {
+    @apply text-gray-900 dark:text-gray-100;
+}
+
+.card-subtitle {
+    @apply text-gray-600 dark:text-gray-400;
+}
+
+.card-description {
+    @apply text-gray-500 dark:text-gray-500;
+}
+
+/* Table Text */
+.table-text {
+    @apply text-gray-900 dark:text-gray-200;
+}
+
+.table-secondary {
+    @apply text-gray-600 dark:text-gray-400;
+}
+
+/* Badge/Pill Colors */
+.badge-participant {
+    @apply bg-eling-emerald/10 text-eling-emerald dark:bg-eling-emerald/20 dark:text-eling-emerald;
+}
+
+.badge-admin {
+    @apply bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300;
+}
+
+/* Input Fields - Better Contrast */
+input.input-glass,
+textarea.input-glass {
+    @apply text-gray-900 dark:text-gray-100;
+}
+
+input.input-glass::placeholder,
+textarea.input-glass::placeholder {
+    @apply text-gray-400 dark:text-gray-500;
+}
+
+/* Dropdown Menu Text */
+.dropdown-item {
+    @apply text-gray-700 dark:text-gray-300;
+}
+
+.dropdown-item:hover {
+    @apply bg-gray-100 dark:bg-gray-700;
+}
