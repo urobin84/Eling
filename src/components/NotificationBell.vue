@@ -95,7 +95,7 @@ onUnmounted(() => {
         <!-- Bell Button -->
         <button @click="showDropdown = !showDropdown"
             class="relative p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors group">
-            <svg class="w-5 h-5 text-gray-900 dark:text-eling-light/70 group-hover:text-gray-900 dark:group-hover:text-eling-light"
+            <svg class="w-5 h-5 text-gray-900 dark:text-eling-dark-text/70 group-hover:text-gray-900 dark:group-hover:text-eling-dark-text"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -109,12 +109,12 @@ onUnmounted(() => {
 
         <!-- Dropdown -->
         <div v-if="showDropdown"
-            class="absolute right-0 mt-2 w-96 bg-white dark:bg-eling-surface rounded-xl shadow-2xl border border-black/10 dark:border-white/10 z-[9999] overflow-hidden">
+            class="absolute right-0 mt-2 w-96 bg-white dark:bg-eling-dark-surface rounded-xl shadow-2xl border border-black/10 dark:border-white/10 z-[9999] overflow-hidden">
             <!-- Header -->
             <div class="flex items-center justify-between px-4 py-3 border-b border-black/10 dark:border-white/10">
-                <h3 class="text-sm font-bold text-gray-900 dark:text-eling-light">Notifications</h3>
+                <h3 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text">Notifications</h3>
                 <button v-if="notifications.length > 0" @click="markAllAsRead" :disabled="isLoading"
-                    class="text-xs text-eling-accent hover:text-eling-accent/80 font-medium disabled:opacity-50">
+                    class="text-xs text-eling-emerald hover:text-eling-emerald/80 font-medium disabled:opacity-50">
                     Mark all as read
                 </button>
             </div>
@@ -122,12 +122,12 @@ onUnmounted(() => {
             <!-- Notifications List -->
             <div class="max-h-96 overflow-y-auto">
                 <div v-if="notifications.length === 0" class="px-4 py-12 text-center">
-                    <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-eling-light/20 mb-3" fill="none"
+                    <svg class="w-12 h-12 mx-auto text-gray-400 dark:text-eling-dark-text/20 mb-3" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                     </svg>
-                    <p class="text-sm text-gray-500 dark:text-eling-light/50">No new notifications</p>
+                    <p class="text-sm text-gray-500 dark:text-eling-dark-text/50">No new notifications</p>
                 </div>
 
                 <div v-for="notification in notifications" :key="notification.id" @click="markAsRead(notification.id)"
@@ -135,8 +135,8 @@ onUnmounted(() => {
                     <div class="flex items-start gap-3">
                         <!-- Icon -->
                         <div
-                            class="flex-shrink-0 w-8 h-8 rounded-full bg-eling-accent/10 flex items-center justify-center">
-                            <svg class="w-4 h-4 text-eling-accent" fill="none" viewBox="0 0 24 24"
+                            class="flex-shrink-0 w-8 h-8 rounded-full bg-eling-emerald/10 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-eling-emerald" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     :d="getNotificationIcon(notification.type)" />
@@ -145,17 +145,17 @@ onUnmounted(() => {
 
                         <!-- Content -->
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 dark:text-eling-light">{{ notification.title }}
+                            <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">{{ notification.title }}
                             </p>
-                            <p class="text-xs text-gray-600 dark:text-eling-light/60 mt-0.5">{{ notification.message }}
+                            <p class="text-xs text-gray-600 dark:text-eling-dark-text/60 mt-0.5">{{ notification.message }}
                             </p>
-                            <p class="text-xs text-gray-500 dark:text-eling-light/40 mt-1">{{
+                            <p class="text-xs text-gray-500 dark:text-eling-dark-text/40 mt-1">{{
                                 formatTime(notification.created_at) }}</p>
                         </div>
 
                         <!-- Unread indicator -->
                         <div class="flex-shrink-0">
-                            <span class="w-2 h-2 bg-eling-accent rounded-full block"></span>
+                            <span class="w-2 h-2 bg-eling-emerald rounded-full block"></span>
                         </div>
                     </div>
                 </div>

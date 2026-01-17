@@ -81,26 +81,26 @@ function getEventsForDay(day: number) {
 <template>
     <div class="space-y-6">
         <!-- Header Controls -->
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
             <!-- View Toggle & Search -->
-            <div class="flex items-center space-x-4 w-full sm:w-auto">
-                <div class="glass-panel p-1 flex space-x-1">
+            <div class="flex items-center space-x-4 w-full sm:w-auto overflow-x-auto px-2 py-6">
+                <div class="glass-panel p-1 flex space-x-1 shrink-0 rounded-full mb-1">
                     <button @click="viewMode = 'list'"
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                        :class="viewMode === 'list' ? 'bg-eling-accent text-eling-dark shadow-lg' : 'text-gray-500 dark:text-gray-900 dark:text-eling-light/50 hover:text-gray-900 dark:text-eling-light'">
+                        class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+                        :class="viewMode === 'list' ? 'bg-eling-emerald text-eling-dark shadow-lg' : 'text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 hover:text-gray-900 dark:text-eling-dark-text'">
                         List View
                     </button>
                     <button @click="viewMode = 'calendar'"
-                        class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
-                        :class="viewMode === 'calendar' ? 'bg-eling-accent text-eling-dark shadow-lg' : 'text-gray-500 dark:text-gray-900 dark:text-eling-light/50 hover:text-gray-900 dark:text-eling-light'">
+                        class="px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+                        :class="viewMode === 'calendar' ? 'bg-eling-emerald text-eling-dark shadow-lg' : 'text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 hover:text-gray-900 dark:text-eling-dark-text'">
                         Calendar
                     </button>
                 </div>
 
                 <div v-if="viewMode === 'list'" class="relative w-full sm:w-64">
                     <input v-model="searchQuery" type="text" placeholder="Search events..."
-                        class="input-glass w-full pl-10 bg-black/20 focus:bg-black/30 border-black/10 dark:border-white/10 py-1.5 text-sm">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-900 dark:text-eling-light/50 absolute left-3 top-2.5"
+                        class="input-glass w-full pl-11 py-2.5 text-sm">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -111,8 +111,8 @@ function getEventsForDay(day: number) {
             <!-- Actions -->
             <div class="flex items-center space-x-3 w-full sm:w-auto">
                 <button @click="$emit('create')"
-                    class="btn-neumorphic text-xs py-2 px-4 flex items-center shadow-eling-accent/20">
-                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-eling-emerald/20 font-bold whitespace-nowrap">
+                    <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     New Assessment
@@ -128,55 +128,55 @@ function getEventsForDay(day: number) {
                     <thead class="bg-black/5 dark:bg-white/5">
                         <tr>
                             <th
-                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Event Name</th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Event Code</th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Participants</th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Status</th>
                             <th
-                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase tracking-wider">
+                                class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-white/5 bg-transparent">
                         <tr v-if="paginatedEvents.length === 0">
                             <td colspan="6"
-                                class="px-6 py-12 text-center text-gray-900 dark:text-eling-light/30 text-sm">
+                                class="px-6 py-12 text-center text-gray-900 dark:text-eling-dark-text/30 text-sm">
                                 No scheduled events found.
                             </td>
                         </tr>
                         <tr v-for="event in paginatedEvents" :key="event.id"
                             class="hover:bg-black/5 dark:bg-white/5 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-bold text-gray-900 dark:text-eling-light">{{ event.event_name
+                                <div class="text-sm font-bold text-gray-900 dark:text-eling-dark-text">{{ event.event_name
                                 }}</div>
                                 <div
-                                    class="text-xs text-gray-600 dark:text-gray-900 dark:text-eling-light/40 font-mono">
+                                    class="text-xs text-gray-600 dark:text-gray-900 dark:text-eling-dark-text/40 font-mono">
                                     ID: {{ event.id }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div v-if="event.event_code"
-                                    class="inline-flex items-center px-3 py-1 rounded-lg bg-eling-accent/20 border border-eling-accent/30">
-                                    <span class="text-sm font-mono font-bold text-eling-accent">{{ event.event_code
+                                    class="inline-flex items-center px-3 py-1 rounded-lg bg-eling-emerald/20 border border-eling-emerald/30">
+                                    <span class="text-sm font-mono font-bold text-eling-emerald">{{ event.event_code
                                         }}</span>
                                 </div>
-                                <span v-else class="text-xs text-gray-900 dark:text-eling-light/30">No code</span>
+                                <span v-else class="text-xs text-gray-900 dark:text-eling-dark-text/30">No code</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-gray-900 dark:text-eling-light/50" fill="none"
+                                    <svg class="w-4 h-4 text-gray-900 dark:text-eling-dark-text/50" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                     </svg>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-eling-light">{{
+                                    <span class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">{{
                                         event.participant_count || 0 }}</span>
                                 </div>
                             </td>
@@ -188,7 +188,7 @@ function getEventsForDay(day: number) {
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <button @click="emit('viewDetails', event.id)"
-                                    class="px-3 py-1.5 text-xs font-medium bg-eling-accent/10 text-eling-accent hover:bg-eling-accent/20 rounded-lg transition-all border border-eling-accent/30">
+                                    class="px-3 py-1.5 text-xs font-medium bg-eling-emerald/10 text-eling-emerald hover:bg-eling-emerald/20 rounded-lg transition-all border border-eling-emerald/30">
                                     👁️ View Details
                                 </button>
                             </td>
@@ -200,13 +200,13 @@ function getEventsForDay(day: number) {
             <div
                 class="bg-black/5 dark:bg-white/5 border-t border-black/10 dark:border-white/10 px-4 py-3 flex items-center justify-between sm:px-6">
                 <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <p class="text-sm text-gray-500 dark:text-gray-900 dark:text-eling-light/50 font-mono">
+                    <p class="text-sm text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 font-mono">
                         Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage,
                             filteredEvents.length) }} of {{ filteredEvents.length }} results
                     </p>
                     <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                         <button @click="currentPage > 1 ? currentPage-- : null" :disabled="currentPage === 1"
-                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-gray-900 dark:text-eling-light/70 hover:bg-black/10 dark:bg-white/10 disabled:opacity-50">
+                            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 disabled:opacity-50">
                             <span class="sr-only">Previous</span>
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
@@ -215,12 +215,12 @@ function getEventsForDay(day: number) {
                             </svg>
                         </button>
                         <span
-                            class="relative inline-flex items-center px-4 py-2 border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-eling-light">
+                            class="relative inline-flex items-center px-4 py-2 border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-eling-dark-text">
                             {{ currentPage }} / {{ totalPages || 1 }}
                         </span>
                         <button @click="currentPage < totalPages ? currentPage++ : null"
                             :disabled="currentPage === totalPages"
-                            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-gray-900 dark:text-eling-light/70 hover:bg-black/10 dark:bg-white/10 disabled:opacity-50">
+                            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-sm font-medium text-gray-900 dark:text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 disabled:opacity-50">
                             <span class="sr-only">Next</span>
                             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
@@ -236,19 +236,19 @@ function getEventsForDay(day: number) {
         <!-- CALENDAR VIEW -->
         <div v-else class="glass-panel p-6 border-black/5 dark:border-white/5 fade-enter-active">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-eling-light flex items-center">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-eling-dark-text flex items-center">
                     <span class="mr-2">{{ currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })
                     }}</span>
                 </h3>
                 <div class="flex space-x-2">
                     <button @click="prevMonth"
-                        class="p-2 rounded-full hover:bg-black/10 dark:bg-white/10 text-gray-900 dark:text-eling-light transition-colors">
+                        class="p-2 rounded-full hover:bg-black/10 dark:bg-white/10 text-gray-900 dark:text-eling-dark-text transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                     <button @click="nextMonth"
-                        class="p-2 rounded-full hover:bg-black/10 dark:bg-white/10 text-gray-900 dark:text-eling-light transition-colors">
+                        class="p-2 rounded-full hover:bg-black/10 dark:bg-white/10 text-gray-900 dark:text-eling-dark-text transition-colors">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
@@ -261,25 +261,25 @@ function getEventsForDay(day: number) {
                 class="grid grid-cols-7 gap-px bg-black/10 dark:bg-white/10 rounded-lg overflow-hidden border border-black/10 dark:border-white/10">
                 <!-- Days Header -->
                 <div v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day"
-                    class="bg-eling-surface/50 p-2 text-center text-xs font-mono font-bold text-gray-500 dark:text-gray-900 dark:text-eling-light/50 uppercase">
+                    class="bg-eling-light-surface/50 p-2 text-center text-xs font-mono font-bold text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase">
                     {{ day }}
                 </div>
 
                 <!-- Empty Cells -->
                 <div v-for="n in firstDayOfMonth" :key="'emp-' + n"
-                    class="bg-white dark:bg-eling-surface/30 min-h-[100px]"></div>
+                    class="bg-white dark:bg-eling-dark-surface/30 min-h-[100px]"></div>
 
                 <!-- Days -->
                 <div v-for="day in daysInMonth" :key="'day-' + day"
-                    class="bg-white dark:bg-eling-surface/30 min-h-[100px] p-2 hover:bg-black/5 dark:bg-white/5 transition-colors group relative border-t border-l border-black/5 dark:border-white/5">
+                    class="bg-white dark:bg-eling-dark-surface/30 min-h-[100px] p-2 hover:bg-black/5 dark:bg-white/5 transition-colors group relative border-t border-l border-black/5 dark:border-white/5">
                     <span
-                        class="text-sm font-mono text-gray-900 dark:text-gray-900 dark:text-eling-light/70 group-hover:text-eling-accent">{{
+                        class="text-sm font-mono text-gray-900 dark:text-gray-900 dark:text-eling-dark-text/70 group-hover:text-eling-emerald">{{
                             day }}</span>
 
                     <!-- Event Dots -->
                     <div class="mt-2 space-y-1">
                         <div v-for="event in getEventsForDay(day)" :key="event.id"
-                            class="text-[10px] px-1.5 py-0.5 rounded bg-eling-accent/20 text-eling-accent border border-eling-accent/30 truncate">
+                            class="text-[10px] px-1.5 py-0.5 rounded bg-eling-emerald/20 text-eling-emerald border border-eling-emerald/30 truncate">
                             {{ event.event_name }}
                         </div>
                     </div>

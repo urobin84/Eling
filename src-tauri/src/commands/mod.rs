@@ -4,6 +4,8 @@ pub mod tools;
 pub mod notifications;
 pub mod kraepelin;
 pub mod events;
+pub mod server;
+pub mod sync;
 
 use tauri::State;
 use crate::db::Database;

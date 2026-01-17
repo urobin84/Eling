@@ -260,21 +260,42 @@ async function handleDeleteQuestion(id: number) {
 
                             <!-- Image Upload -->
                             <div>
-                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Image (Optional)</label>
-                                <input type="file" accept="image/*" @change="handleImageSelect"
-                                    class="w-full text-xs text-eling-light-subtext dark:text-eling-dark-text/50 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-200 dark:file:bg-white/10 file:text-eling-light-text dark:file:text-eling-dark-text hover:file:bg-gray-300 dark:hover:file:bg-white/20 cursor-pointer" />
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-2">Image (Optional)</label>
+                                
+                                <div class="relative group">
+                                    <input type="file" accept="image/*" @change="handleImageSelect" id="question-image"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                    
+                                    <div class="border-2 border-dashed border-gray-300 dark:border-white/10 rounded-xl p-4 transition-all group-hover:border-eling-emerald/50 bg-gray-50/50 dark:bg-white/5 flex flex-col items-center justify-center text-center space-y-2">
+                                        <div class="p-2 rounded-full bg-eling-emerald/10 text-eling-emerald">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs">
+                                            <span class="font-medium text-eling-light-text dark:text-eling-dark-text">Click to upload</span>
+                                            <span class="text-eling-light-subtext dark:text-eling-dark-text/50"> or drag and drop</span>
+                                        </div>
+                                        <p class="text-[10px] text-eling-light-subtext/70 dark:text-eling-dark-text/30">SVG, PNG, JPG or GIF</p>
+                                    </div>
+                                </div>
 
                                 <!-- Image Preview -->
-                                <div v-if="imagePreview" class="mt-2 relative">
-                                    <img :src="imagePreview" class="w-full h-32 object-contain bg-gray-100 dark:bg-black/40 rounded border border-gray-200 dark:border-transparent" />
-                                    <button @click="clearImage" type="button"
-                                        class="absolute top-1 right-1 p-1 bg-red-500/80 rounded hover:bg-red-600">
-                                        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                                <div v-if="imagePreview" class="mt-3 relative group">
+                                    <div class="rounded-xl overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-black/40">
+                                        <img :src="imagePreview" class="w-full h-40 object-contain" />
+                                        
+                                        <!-- Remove Overlay -->
+                                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                            <button @click="clearImage" type="button"
+                                                class="flex items-center gap-2 px-3 py-1.5 bg-red-500/90 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-medium">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Remove Image
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

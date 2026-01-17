@@ -183,11 +183,11 @@ onMounted(() => {
 <template>
     <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
         @click.self="emit('close')">
-        <div class="bg-white dark:bg-eling-surface rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-black/10 dark:border-white/10"
+        <div class="bg-white dark:bg-eling-dark-surface rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-black/10 dark:border-white/10"
             @click.stop>
 
             <!-- Header -->
-            <div class="bg-gradient-to-r from-eling-accent to-blue-500 p-6 text-eling-dark">
+            <div class="bg-gradient-to-r from-eling-emerald to-blue-500 p-6 text-eling-dark">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
                         <h2 class="text-2xl font-bold mb-2">{{ eventDetails?.event_name || 'Loading...' }}</h2>
@@ -208,14 +208,14 @@ onMounted(() => {
                 <div class="flex">
                     <button @click="activeTab = 'overview'" class="px-6 py-3 font-medium transition-all"
                         :class="activeTab === 'overview'
-                            ? 'text-eling-accent border-b-2 border-eling-accent bg-white dark:bg-eling-surface'
-                            : 'text-gray-900 dark:text-eling-light/50 hover:text-gray-900 dark:hover:text-eling-light'">
+                            ? 'text-eling-emerald border-b-2 border-eling-emerald bg-white dark:bg-eling-dark-surface'
+                            : 'text-gray-900 dark:text-eling-dark-text/50 hover:text-gray-900 dark:hover:text-eling-dark-text'">
                         Overview
                     </button>
                     <button @click="activeTab = 'participants'" class="px-6 py-3 font-medium transition-all"
                         :class="activeTab === 'participants'
-                            ? 'text-eling-accent border-b-2 border-eling-accent bg-white dark:bg-eling-surface'
-                            : 'text-gray-900 dark:text-eling-light/50 hover:text-gray-900 dark:hover:text-eling-light'">
+                            ? 'text-eling-emerald border-b-2 border-eling-emerald bg-white dark:bg-eling-dark-surface'
+                            : 'text-gray-900 dark:text-eling-dark-text/50 hover:text-gray-900 dark:hover:text-eling-dark-text'">
                         Participants ({{ eventDetails?.participant_count || 0 }})
                     </button>
                 </div>
@@ -225,31 +225,31 @@ onMounted(() => {
             <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                 <!-- Loading State -->
                 <div v-if="isLoading" class="flex items-center justify-center py-12">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-eling-accent"></div>
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-eling-emerald"></div>
                 </div>
 
                 <!-- Overview Tab -->
                 <div v-else-if="activeTab === 'overview'" class="space-y-6">
                     <!-- Event Code Section -->
                     <div
-                        class="bg-gradient-to-br from-eling-accent/10 to-blue-500/10 border border-eling-accent/30 rounded-xl p-6">
-                        <h3 class="text-sm font-bold text-gray-900 dark:text-eling-light mb-4">Event Access Code</h3>
+                        class="bg-gradient-to-br from-eling-emerald/10 to-blue-500/10 border border-eling-emerald/30 rounded-xl p-6">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text mb-4">Event Access Code</h3>
                         <div v-if="eventDetails?.event_code" class="flex items-center gap-4">
-                            <div class="flex-1 bg-white dark:bg-eling-dark rounded-lg p-4 border-2 border-eling-accent">
-                                <div class="text-3xl font-mono font-bold text-eling-accent text-center tracking-widest">
+                            <div class="flex-1 bg-white dark:bg-eling-dark rounded-lg p-4 border-2 border-eling-emerald">
+                                <div class="text-3xl font-mono font-bold text-eling-emerald text-center tracking-widest">
                                     {{ eventDetails.event_code }}
                                 </div>
                             </div>
                             <button @click="copyEventCode"
-                                class="px-4 py-3 bg-eling-accent text-eling-dark rounded-lg hover:bg-eling-accent/90 transition-all font-medium">
+                                class="px-4 py-3 bg-eling-emerald text-eling-dark rounded-lg hover:bg-eling-emerald/90 transition-all font-medium">
                                 📋 Copy
                             </button>
                         </div>
                         <div v-else class="text-center py-4">
-                            <p class="text-sm text-gray-900 dark:text-eling-light/50 mb-4">No event code generated yet
+                            <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mb-4">No event code generated yet
                             </p>
                             <button @click="generateEventCode" :disabled="generatingCode"
-                                class="px-6 py-3 bg-eling-accent text-eling-dark rounded-lg hover:bg-eling-accent/90 transition-all font-medium disabled:opacity-50">
+                                class="px-6 py-3 bg-eling-emerald text-eling-dark rounded-lg hover:bg-eling-emerald/90 transition-all font-medium disabled:opacity-50">
                                 {{ generatingCode ? 'Generating...' : '🔑 Generate Code' }}
                             </button>
                         </div>
@@ -259,32 +259,32 @@ onMounted(() => {
                     <div class="grid grid-cols-2 gap-4">
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-lg p-4 border border-black/10 dark:border-white/10">
-                            <div class="text-xs text-gray-900 dark:text-eling-light/50 mb-1">Status</div>
-                            <div class="text-lg font-bold text-gray-900 dark:text-eling-light capitalize">{{
+                            <div class="text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Status</div>
+                            <div class="text-lg font-bold text-gray-900 dark:text-eling-dark-text capitalize">{{
                                 eventDetails?.status }}</div>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-lg p-4 border border-black/10 dark:border-white/10">
-                            <div class="text-xs text-gray-900 dark:text-eling-light/50 mb-1">Participants</div>
-                            <div class="text-lg font-bold text-gray-900 dark:text-eling-light">
+                            <div class="text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Participants</div>
+                            <div class="text-lg font-bold text-gray-900 dark:text-eling-dark-text">
                                 {{ eventDetails?.participant_count }}
                                 <span v-if="eventDetails?.max_participants"
-                                    class="text-sm text-gray-900 dark:text-eling-light/50">
+                                    class="text-sm text-gray-900 dark:text-eling-dark-text/50">
                                     / {{ eventDetails.max_participants }}
                                 </span>
                             </div>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-lg p-4 border border-black/10 dark:border-white/10">
-                            <div class="text-xs text-gray-900 dark:text-eling-light/50 mb-1">Created</div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-eling-light">
+                            <div class="text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Created</div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">
                                 {{ new Date(eventDetails?.created_at || '').toLocaleDateString() }}
                             </div>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-lg p-4 border border-black/10 dark:border-white/10">
-                            <div class="text-xs text-gray-900 dark:text-eling-light/50 mb-1">Enrollment Deadline</div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-eling-light">
+                            <div class="text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Enrollment Deadline</div>
+                            <div class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">
                                 {{ eventDetails?.enrollment_deadline ? new
                                     Date(eventDetails.enrollment_deadline).toLocaleDateString() : 'No deadline' }}
                             </div>
@@ -296,9 +296,9 @@ onMounted(() => {
                 <div v-else-if="activeTab === 'participants'" class="space-y-4">
                     <!-- Add Participant Button -->
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-eling-light">Enrolled Candidates</h3>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-eling-dark-text">Enrolled Candidates</h3>
                         <button @click="showAddParticipant = !showAddParticipant"
-                            class="px-4 py-2 bg-eling-accent text-eling-dark rounded-lg hover:bg-eling-accent/90 transition-all font-medium text-sm">
+                            class="px-4 py-2 bg-eling-emerald text-eling-dark rounded-lg hover:bg-eling-emerald/90 transition-all font-medium text-sm">
                             {{ showAddParticipant ? '✕ Cancel' : '➕ Add Participant' }}
                         </button>
                     </div>
@@ -307,26 +307,26 @@ onMounted(() => {
                     <div v-if="showAddParticipant"
                         class="bg-black/5 dark:bg-white/5 rounded-lg p-4 border border-black/10 dark:border-white/10">
                         <input v-model="searchQuery" type="text" placeholder="Search candidates..."
-                            class="w-full px-4 py-2 rounded-lg bg-white dark:bg-eling-dark border border-black/10 dark:border-white/10 mb-3 text-gray-900 dark:text-eling-light">
+                            class="input-glass w-full mb-3">
 
                         <div class="max-h-48 overflow-y-auto space-y-2">
                             <button v-for="user in availableCandidates" :key="user.id" @click="selectedUserId = user.id"
                                 class="w-full text-left px-4 py-2 rounded-lg transition-all border"
                                 :class="selectedUserId === user.id
-                                    ? 'bg-eling-accent/20 border-eling-accent text-gray-900 dark:text-eling-light'
-                                    : 'bg-white dark:bg-eling-dark border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 text-gray-900 dark:text-eling-light'">
+                                    ? 'bg-eling-emerald/20 border-eling-emerald text-gray-900 dark:text-eling-dark-text'
+                                    : 'bg-white dark:bg-eling-dark border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 text-gray-900 dark:text-eling-dark-text'">
                                 <div class="font-medium">{{ user.username }}</div>
-                                <div v-if="user.email" class="text-xs text-gray-900 dark:text-eling-light/50">{{
+                                <div v-if="user.email" class="text-xs text-gray-900 dark:text-eling-dark-text/50">{{
                                     user.email }}</div>
                             </button>
                             <div v-if="availableCandidates.length === 0"
-                                class="text-center py-4 text-sm text-gray-900 dark:text-eling-light/50">
+                                class="text-center py-4 text-sm text-gray-900 dark:text-eling-dark-text/50">
                                 No available candidates
                             </div>
                         </div>
 
                         <button @click="addParticipant" :disabled="!selectedUserId"
-                            class="w-full mt-3 px-4 py-2 bg-eling-accent text-eling-dark rounded-lg hover:bg-eling-accent/90 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="w-full mt-3 px-4 py-2 bg-eling-emerald text-eling-dark rounded-lg hover:bg-eling-emerald/90 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed">
                             Add Selected Candidate
                         </button>
                     </div>
@@ -334,13 +334,13 @@ onMounted(() => {
                     <!-- Participants List -->
                     <div class="space-y-2">
                         <div v-for="participant in participants" :key="participant.user_id"
-                            class="flex items-center justify-between p-4 bg-white dark:bg-eling-dark rounded-lg border border-black/10 dark:border-white/10 hover:border-eling-accent/30 transition-all">
+                            class="flex items-center justify-between p-4 bg-white dark:bg-eling-dark rounded-lg border border-black/10 dark:border-white/10 hover:border-eling-emerald/30 transition-all">
                             <div class="flex-1">
-                                <div class="font-medium text-gray-900 dark:text-eling-light">{{ participant.username }}
+                                <div class="font-medium text-gray-900 dark:text-eling-dark-text">{{ participant.username }}
                                 </div>
-                                <div v-if="participant.email" class="text-xs text-gray-900 dark:text-eling-light/50">{{
+                                <div v-if="participant.email" class="text-xs text-gray-900 dark:text-eling-dark-text/50">{{
                                     participant.email }}</div>
-                                <div class="text-xs text-gray-900 dark:text-eling-light/50 mt-1">
+                                <div class="text-xs text-gray-900 dark:text-eling-dark-text/50 mt-1">
                                     Enrolled: {{ new Date(participant.enrolled_at).toLocaleDateString() }}
                                 </div>
                             </div>
@@ -359,7 +359,7 @@ onMounted(() => {
                             </div>
                         </div>
                         <div v-if="participants.length === 0"
-                            class="text-center py-8 text-gray-900 dark:text-eling-light/50">
+                            class="text-center py-8 text-gray-900 dark:text-eling-dark-text/50">
                             No participants enrolled yet
                         </div>
                     </div>

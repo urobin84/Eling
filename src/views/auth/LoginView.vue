@@ -68,48 +68,45 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-eling-dark relative overflow-hidden">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
     <!-- Ambient Background -->
-    <div class="absolute inset-0 bg-gradient-to-br from-[#1B3022] to-[#0D1612]"></div>
-    <div class="absolute -top-40 -right-40 w-96 h-96 bg-eling-accent/10 rounded-full blur-3xl animate-pulse"></div>
-    <div
-      class="absolute bottom-20 left-20 w-64 h-64 bg-eling-secondary/10 rounded-full blur-3xl animate-pulse delay-700">
-    </div>
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-emerald-50 to-cyan-50"></div>
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-eling-emerald/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-20 left-20 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl animate-pulse delay-700"></div>
 
     <!-- Login Card -->
-    <div class="glass-panel w-full max-w-md p-8 relative z-10 border-eling-accent/20 flex flex-col items-center">
+    <div class="bg-white/90 backdrop-blur-xl w-full max-w-md p-8 relative z-10 rounded-3xl shadow-2xl border border-gray-200/50 flex flex-col items-center">
 
       <!-- Logo -->
       <div class="mb-8 flex flex-col items-center">
         <div
-          class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-eling-surface to-eling-dark border border-eling-accent/30 flex items-center justify-center shadow-lg shadow-eling-accent/10 mb-4">
-          <span class="text-2xl font-bold text-eling-accent">E</span>
+          class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-eling-emerald to-emerald-600 border border-eling-emerald/30 flex items-center justify-center shadow-lg shadow-eling-emerald/30 mb-4">
+          <span class="text-2xl font-bold text-white">E</span>
         </div>
-        <h1 class="text-2xl font-bold text-eling-light tracking-wide">ELING</h1>
-        <p class="text-xs text-eling-light/50 font-mono tracking-widest uppercase mt-1">Conscious Intelligence</p>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-wide">ELING</h1>
+        <p class="text-xs text-gray-500 font-mono tracking-widest uppercase mt-1">Conscious Intelligence</p>
       </div>
 
       <form class="w-full space-y-6" @submit.prevent="handleLogin">
         <div class="space-y-4">
           <div>
             <label for="username"
-              class="block text-xs font-mono text-eling-accent mb-1.5 uppercase tracking-wider">Username</label>
+              class="block text-xs font-mono text-eling-emerald mb-1.5 uppercase tracking-wider">Username</label>
             <input v-model="username" id="username" type="text" required
-              class="input-glass w-full bg-black/20 focus:bg-black/40 border-white/10 text-center tracking-wider"
+              class="input-glass w-full text-center tracking-wider"
               placeholder="ENTER USERNAME">
           </div>
           <div>
             <label for="password"
-              class="block text-xs font-mono text-eling-light/70 mb-1.5 uppercase tracking-wider">Password</label>
+              class="block text-xs font-mono text-eling-dark-text/70 mb-1.5 uppercase tracking-wider">Password</label>
             <input v-model="password" id="password" type="password" required
-              class="input-glass w-full bg-black/20 focus:bg-black/40 border-white/10 text-center tracking-wider"
+              class="input-glass w-full text-center tracking-wider"
               placeholder="••••••••">
           </div>
         </div>
 
-        <div v-if="error"
-          class="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs text-center font-mono">
-          {{ error }}
+        <div v-if="error" class="p-3 rounded-lg bg-red-50 border border-red-200">
+          <p class="text-sm text-red-600 text-center">{{ error }}</p>
         </div>
 
         <div>
@@ -121,17 +118,17 @@ async function handleLogin() {
           </button>
         </div>
 
-        <div class="text-center pt-4 border-t border-white/5">
-          <router-link to="/register"
-            class="text-xs font-mono text-eling-light/40 hover:text-eling-accent transition-colors">
-            NO ACCOUNT? REGISTER_CANDIDATE
-          </router-link>
+        <div class="mt-6 text-center">
+          <p class="text-xs text-gray-500 font-mono">
+            Don't have an account?
+            <router-link to="/register" class="text-eling-emerald hover:underline ml-1 font-semibold">Register here</router-link>
+          </p>
         </div>
       </form>
     </div>
 
     <!-- Footer -->
-    <div class="absolute bottom-6 text-[10px] font-mono text-eling-light/20">
+    <div class="absolute bottom-6 text-[10px] font-mono text-eling-dark-text/20">
       SECURE TERMINAL // V1.0.0
     </div>
   </div>

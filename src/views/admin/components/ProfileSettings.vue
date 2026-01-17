@@ -113,8 +113,8 @@ onMounted(() => {
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-light">Profile Settings</h2>
-            <p class="text-sm text-gray-600 dark:text-eling-light/60 mt-1">Manage your account information and
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Profile Settings</h2>
+            <p class="text-sm text-gray-600 dark:text-eling-dark-text/60 mt-1">Manage your account information and
                 preferences</p>
         </div>
 
@@ -123,18 +123,18 @@ onMounted(() => {
             <!-- Avatar Section -->
             <div class="flex items-start gap-6 mb-8 pb-8 border-b border-black/10 dark:border-white/10">
                 <div
-                    class="w-24 h-24 rounded-full bg-gradient-to-br from-eling-accent to-green-400 flex items-center justify-center text-eling-dark font-bold text-3xl shadow-lg">
+                    class="w-24 h-24 rounded-full bg-gradient-to-br from-eling-emerald to-green-400 flex items-center justify-center text-eling-dark font-bold text-3xl shadow-lg">
                     {{ profile.username.charAt(0).toUpperCase() }}
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-eling-light">{{ profile.username }}</h3>
-                    <p class="text-sm text-gray-600 dark:text-eling-light/60 mt-1">{{ profile.email }}</p>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-eling-dark-text">{{ profile.username }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-eling-dark-text/60 mt-1">{{ profile.email }}</p>
                     <div class="flex items-center gap-2 mt-3">
                         <span
-                            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-eling-accent/10 text-eling-accent border border-eling-accent/20">
+                            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-eling-emerald/10 text-eling-emerald border border-eling-emerald/20">
                             {{ profile.role }}
                         </span>
-                        <span class="text-xs text-gray-500 dark:text-eling-light/40">
+                        <span class="text-xs text-gray-500 dark:text-eling-dark-text/40">
                             Member since {{ formatDate(profile.created_at) }}
                         </span>
                     </div>
@@ -153,30 +153,30 @@ onMounted(() => {
             <div v-if="!isEditing" class="space-y-6">
                 <!-- Account Information -->
                 <div>
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light/80 mb-4 uppercase tracking-wider">
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-4 uppercase tracking-wider">
                         Account Information</h4>
                     <div class="grid grid-cols-2 gap-6">
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10">
-                            <p class="text-xs text-gray-500 dark:text-eling-light/50 mb-1">Username</p>
-                            <p class="text-sm font-medium text-gray-900 dark:text-eling-light">{{ profile.username }}
+                            <p class="text-xs text-gray-500 dark:text-eling-dark-text/50 mb-1">Username</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">{{ profile.username }}
                             </p>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10">
-                            <p class="text-xs text-gray-500 dark:text-eling-light/50 mb-1">Email</p>
-                            <p class="text-sm font-medium text-gray-900 dark:text-eling-light">{{ profile.email || 'Not set' }}</p>
+                            <p class="text-xs text-gray-500 dark:text-eling-dark-text/50 mb-1">Email</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">{{ profile.email || 'Not set' }}</p>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10">
-                            <p class="text-xs text-gray-500 dark:text-eling-light/50 mb-1">Role</p>
-                            <p class="text-sm font-medium text-gray-900 dark:text-eling-light capitalize">{{
+                            <p class="text-xs text-gray-500 dark:text-eling-dark-text/50 mb-1">Role</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text capitalize">{{
                                 profile.role }}</p>
                         </div>
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10">
-                            <p class="text-xs text-gray-500 dark:text-eling-light/50 mb-1">User ID</p>
-                            <p class="text-sm font-medium text-gray-900 dark:text-eling-light font-mono">#{{
+                            <p class="text-xs text-gray-500 dark:text-eling-dark-text/50 mb-1">User ID</p>
+                            <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text font-mono">#{{
                                 profile.id.toString().padStart(4, '0') }}</p>
                         </div>
                     </div>
@@ -184,15 +184,15 @@ onMounted(() => {
 
                 <!-- Security -->
                 <div>
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light/80 mb-4 uppercase tracking-wider">
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-4 uppercase tracking-wider">
                         Security</h4>
                     <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-900 dark:text-eling-light">Password</p>
-                                <p class="text-xs text-gray-500 dark:text-eling-light/50 mt-1">Last changed: Never</p>
+                                <p class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">Password</p>
+                                <p class="text-xs text-gray-500 dark:text-eling-dark-text/50 mt-1">Last changed: Never</p>
                             </div>
-                            <span class="text-xs text-gray-900 dark:text-eling-light/60 font-mono">••••••••</span>
+                            <span class="text-xs text-gray-900 dark:text-eling-dark-text/60 font-mono">••••••••</span>
                         </div>
                     </div>
                 </div>
@@ -202,23 +202,23 @@ onMounted(() => {
             <div v-else class="space-y-6">
                 <!-- Basic Information -->
                 <div>
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light/80 mb-4 uppercase tracking-wider">
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-4 uppercase tracking-wider">
                         Basic Information</h4>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-light/70 mb-2">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-dark-text/70 mb-2">
                                 Username *
                             </label>
                             <input v-model="editForm.username" type="text"
-                                class="input-glass w-full bg-black/20 dark:bg-white/5 border-black/10 dark:border-white/10"
+                                class="input-glass w-full"
                                 placeholder="Enter username">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-light/70 mb-2">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-dark-text/70 mb-2">
                                 Email
                             </label>
                             <input v-model="editForm.email" type="email"
-                                class="input-glass w-full bg-black/20 dark:bg-white/5 border-black/10 dark:border-white/10"
+                                class="input-glass w-full"
                                 placeholder="Enter email address">
                         </div>
                     </div>
@@ -227,37 +227,37 @@ onMounted(() => {
                 <!-- Change Password Section -->
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light/80 uppercase tracking-wider">
+                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 uppercase tracking-wider">
                             Change Password</h4>
                         <button @click="showPasswordSection = !showPasswordSection"
-                            class="text-xs text-eling-accent hover:text-eling-accent/80 font-medium">
+                            class="text-xs text-eling-emerald hover:text-eling-emerald/80 font-medium">
                             {{ showPasswordSection ? 'Cancel' : 'Change Password' }}
                         </button>
                     </div>
 
                     <div v-if="showPasswordSection" class="space-y-4 animate-fade-in">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-light/70 mb-2">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-dark-text/70 mb-2">
                                 Current Password *
                             </label>
                             <input v-model="editForm.currentPassword" type="password"
-                                class="input-glass w-full bg-black/20 dark:bg-white/5 border-black/10 dark:border-white/10"
+                                class="input-glass w-full"
                                 placeholder="Enter current password">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-light/70 mb-2">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-dark-text/70 mb-2">
                                 New Password *
                             </label>
                             <input v-model="editForm.newPassword" type="password"
-                                class="input-glass w-full bg-black/20 dark:bg-white/5 border-black/10 dark:border-white/10"
+                                class="input-glass w-full"
                                 placeholder="Enter new password (min. 6 characters)">
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-light/70 mb-2">
+                            <label class="block text-xs font-medium text-gray-700 dark:text-eling-dark-text/70 mb-2">
                                 Confirm New Password *
                             </label>
                             <input v-model="editForm.confirmPassword" type="password"
-                                class="input-glass w-full bg-black/20 dark:bg-white/5 border-black/10 dark:border-white/10"
+                                class="input-glass w-full"
                                 placeholder="Confirm new password">
                         </div>
                     </div>
@@ -266,7 +266,7 @@ onMounted(() => {
                 <!-- Action Buttons -->
                 <div class="flex justify-end gap-3 pt-4 border-t border-black/10 dark:border-white/10">
                     <button @click="cancelEdit" :disabled="isSaving"
-                        class="px-6 py-2 rounded-lg text-sm text-gray-700 dark:text-eling-light/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50">
+                        class="px-6 py-2 rounded-lg text-sm text-gray-700 dark:text-eling-dark-text/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors disabled:opacity-50">
                         Cancel
                     </button>
                     <button @click="saveProfile" :disabled="isSaving"

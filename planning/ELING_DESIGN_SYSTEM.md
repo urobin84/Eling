@@ -119,7 +119,7 @@ export default {
 
 html.dark .glass-panel {
   /* Dark mode: Opasitas hitam 60% */
-  background: rgba(30, 31, 32, 0.6);
+  background: rgba(19, 19, 20, 0.8);
   border: 1px solid rgba(227, 227, 227, 0.1);
 }
 ```

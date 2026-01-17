@@ -4,58 +4,59 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
-  darkMode: 'class', // Manual toggle support
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         eling: {
-          // Light Mode Colors (Siang/Fokus - Kejujuran Batin)
+          // --- GEMINI LIGHT MODE ---
           light: {
-            bg: '#F8FAFD',      // Putih Kebiruan - Bersih & Fokus
-            card: '#FFFFFF',    // Putih Murni - Fokus Konten
-            surface: '#EDF2FA', // Biru Pucat - Pemisah Area
-            text: '#1F1F1F',    // Dark Gray - Readability
+            bg: '#F0F4F9',      // Gemini Light Grayish Blue (Lebih fresh)
+            card: '#FFFFFF',    // White
+            surface: '#E9EEF6', // Gemini Light Hover/Active
+            text: '#1F1F1F',    // Google Standard Text
+            subtext: '#444746', // Secondary Text
           },
-          // Dark Mode Colors (Malam/Tenang - Refleksi Diri)
+          // --- GEMINI DARK MODE ---
           dark: {
-            bg: '#131314',      // Hitam Google - Ketenangan
-            card: '#1E1F20',    // Deep Gray - Fokus Konten
-            surface: '#2C2D2E', // Abu Gelap - Pemisah Area
-            text: '#E3E3E3',    // Off-White - Readability
+            bg: '#0E0E10',      // Deepest Obsidian (Gemini 2026 Standard)
+            card: '#131314',    // Elevated Surface (Pengganti #1E1F20)
+            surface: '#1E1F20', // Higher Elevation (Hover/Secondary)
+            text: '#E3E3E3',    // Soft White
+            subtext: '#C4C7C5', // Muted Gray
           },
-          // Accent Colors (Identitas Robin)
-          emerald: '#10B981',   // Hijau Robin - Kesadaran
-          blue: '#4285F4',      // Biru AI - Teknologi
-          purple: '#A142F4',    // Purple - Spiritual
+          // --- GEMINI ACCENTS ---
+          emerald: '#10B981',   // Tetap Hijau Robin (Identity)
+          blue: '#4285F4',      // Google Blue
+          purple: '#A142F4',    // Gemini Purple
 
-          // Legacy support (for gradual migration)
-          accent: '#10B981',
-          danger: '#FFC107',
+          // Common
+          border: 'rgba(255, 255, 255, 0.1)',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Google Sans', 'Plus Jakarta Sans', 'sans-serif'],
-        body: ['Inter', 'Roboto', 'Outfit', 'sans-serif'],
+        // Mengutamakan font Gemini
+        sans: ['Google Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       backgroundImage: {
-        // Gemini-style gradients (The "Eling Glow")
-        'gemini-gradient': 'linear-gradient(135deg, #10B981 0%, #4285F4 50%, #A142F4 100%)',
-        'eling-gradient': 'linear-gradient(135deg, #10B981 0%, #4285F4 100%)',
-        'eling-glow': 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(66, 133, 244, 0.1) 100%)',
+        // Animasi Gradasi Gemini yang ikonik
+        'gemini-gradient': 'linear-gradient(70deg, #4285F4 0%, #10B981 50%, #A142F4 100%)',
 
-        // Light mode backgrounds
-        'light-gradient': 'linear-gradient(135deg, #F8FAFD 0%, #EDF2FA 100%)',
-
-        // Dark mode backgrounds
-        'dark-gradient': 'linear-gradient(135deg, #131314 0%, #1E1F20 100%)',
+        // Background Mesh untuk kesan spiritual Robin
+        'eling-mesh-dark': `
+          radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 40%),
+          radial-gradient(at 100% 100%, rgba(66, 133, 244, 0.08) 0px, transparent 40%)
+        `,
+        'eling-mesh-light': `
+          radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 35%),
+          radial-gradient(at 100% 100%, rgba(66, 133, 244, 0.05) 0px, transparent 35%)
+        `,
       },
-      borderRadius: {
-        '3xl': '1.5rem', // Bento Box style
-        '4xl': '2rem',
-      },
-      backdropBlur: {
-        'glass': '12px',
+      boxShadow: {
+        // Shadow halus khas Gemini
+        'gemini-soft': '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+        'gemini-elevated': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
       }
     },
   },

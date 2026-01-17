@@ -31,4 +31,20 @@ image = "0.24"
 bcrypt = "0.15"
 base64 = "0.21"
 rand = "0.8"
+lazy_static = "1.4"
+
+# REST API Server (Admin)
+axum = { version = "0.7", features = ["multipart"] }
+tower = { version = "0.4", features = ["util"] }
+tower-http = { version = "0.5", features = ["cors", "fs"] }
+
+# HTTP Client (Candidate)
+reqwest = { version = "0.11", features = ["json", "multipart"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
+mockito = "1.2"
+tempfile = "3.0"
+
+
 

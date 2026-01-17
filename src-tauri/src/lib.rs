@@ -8,6 +8,9 @@ use bcrypt;
 mod db;
 mod commands;
 mod tests;
+mod recording;
+mod api_server;
+mod sync;
 
 pub mod tools {
     pub use crate::commands::tools::*;
@@ -117,7 +120,32 @@ pub fn run() {
             commands::events::generate_event_code_cmd,
             surveillance::check_camera_permission,
             surveillance::capture_frame,
-            surveillance::window::set_kiosk_mode
+            surveillance::register_session,
+            surveillance::update_session_frame,
+            surveillance::get_active_sessions,
+            surveillance::get_session_frame,
+            surveillance::unregister_session,
+            surveillance::cleanup_stale_sessions,
+            surveillance::window::set_kiosk_mode,
+            recording::save_camera_recording,
+            recording::save_screen_recording,
+            recording::save_recording_metadata,
+            recording::get_session_recordings,
+            recording::get_all_recordings,
+            recording::delete_session_recording,
+            recording::get_recording_video_path,
+            recording::cleanup_old_recordings,
+            // Server commands (Admin)
+            commands::server::start_api_server,
+            commands::server::stop_api_server,
+            commands::server::get_server_status,
+            commands::server::get_local_ips,
+            // Sync commands (Candidate)
+            commands::sync::set_server_url,
+            commands::sync::get_server_url,
+            commands::sync::test_server_connection,
+            commands::sync::trigger_sync,
+            commands::sync::get_sync_queue_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

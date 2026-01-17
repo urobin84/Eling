@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import SearchableDropdown from '@/components/molecules/SearchableDropdown.vue';
+import ExportSettingsModal from './ExportSettingsModal.vue';
 
 interface TestResult {
     id: number;
@@ -28,6 +30,20 @@ const results = ref<TestResult[]>([]);
 const tools = ref<Tool[]>([]);
 const loading = ref(true);
 
+const statusOptions = [
+    { value: 'all', label: 'All Status' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'reviewed', label: 'Reviewed' }
+];
+
+const toolOptions = computed(() => {
+    return [
+        { id: null, name: 'All Tools' },
+        ...tools.value
+    ];
+});
+
 // Filters
 const searchQuery = ref('');
 const selectedTool = ref<number | null>(null);
@@ -38,6 +54,7 @@ const itemsPerPage = ref(10);
 // Selected result for detail modal
 const selectedResult = ref<TestResult | null>(null);
 const showDetailModal = ref(false);
+const showExportModal = ref(false);
 
 // Computed
 const filteredResults = computed(() => {
@@ -124,8 +141,7 @@ function getScoreColor(percentile: number | undefined) {
 }
 
 function exportResults() {
-    // TODO: Implement CSV/PDF export
-    alert('Export functionality coming soon!');
+    showExportModal.value = true;
 }
 
 onMounted(fetchData);
@@ -154,12 +170,12 @@ onMounted(fetchData);
         </div>
 
         <!-- Filters -->
-        <div class="glass-panel p-4 flex flex-wrap items-center gap-4">
+        <div class="glass-panel p-4 flex flex-wrap items-center gap-4 relative z-20">
             <!-- Search -->
             <div class="relative flex-1 min-w-[200px]">
                 <input v-model="searchQuery" type="text" placeholder="Search candidates, events, tools..."
-                    class="input-glass w-full pl-10 bg-black/20 focus:bg-black/30 border-black/10 dark:border-white/10 py-2 text-sm">
-                <svg class="w-4 h-4 text-gray-900 dark:text-white/50 absolute left-3 top-3" fill="none"
+                    class="input-glass w-full pl-11 py-2.5 text-sm">
+                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -167,23 +183,28 @@ onMounted(fetchData);
             </div>
 
             <!-- Tool Filter -->
-            <select v-model="selectedTool"
-                class="input-glass bg-black/20 border-black/10 dark:border-white/10 py-2 text-sm min-w-[150px]">
-                <option :value="null">All Tools</option>
-                <option v-for="tool in tools" :key="tool.id" :value="tool.id">{{ tool.name }}</option>
-            </select>
+            <SearchableDropdown
+                v-model="selectedTool"
+                :options="toolOptions"
+                label-key="name"
+                value-key="id"
+                placeholder="All Tools"
+                class="min-w-[180px]"
+            />
 
             <!-- Status Filter -->
-            <select v-model="selectedStatus"
-                class="input-glass bg-black/20 border-black/10 dark:border-white/10 py-2 text-sm min-w-[130px]">
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-                <option value="reviewed">Reviewed</option>
-            </select>
+            <SearchableDropdown 
+                v-model="selectedStatus"
+                :options="statusOptions"
+                label-key="label"
+                value-key="value"
+                placeholder="All Status"
+                :searchable="false"
+                class="min-w-[160px]"
+            />
 
             <!-- Export Button -->
-            <button @click="exportResults" class="btn-neumorphic text-xs py-2 px-4 flex items-center">
+            <button @click="exportResults" class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-eling-emerald/20 font-bold whitespace-nowrap">
                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -236,7 +257,7 @@ onMounted(fetchData);
                         <tr v-if="loading">
                             <td colspan="8" class="px-6 py-12 text-center">
                                 <div
-                                    class="animate-spin w-8 h-8 border-2 border-eling-accent border-t-transparent rounded-full mx-auto">
+                                    class="animate-spin w-8 h-8 border-2 border-eling-emerald border-t-transparent rounded-full mx-auto">
                                 </div>
                             </td>
                         </tr>
@@ -268,7 +289,7 @@ onMounted(fetchData);
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="text-sm font-bold text-eling-accent">{{ result.tool_name }}</span>
+                                <span class="text-sm font-bold text-eling-emerald">{{ result.tool_name }}</span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="text-lg font-bold text-gray-900 dark:text-white">{{ result.score || '-' }}
@@ -344,7 +365,7 @@ onMounted(fetchData);
                 <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="showDetailModal = false"></div>
 
                 <!-- Modal -->
-                <div class="relative glass-panel w-full max-w-2xl p-6 bg-eling-surface border-eling-accent/20">
+                <div class="relative glass-panel w-full max-w-2xl p-6 bg-eling-light-surface border-eling-emerald/20">
                     <div class="flex justify-between items-start mb-6">
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white">Test Result Detail</h3>
@@ -415,5 +436,12 @@ onMounted(fetchData);
                 </div>
             </div>
         </div>
+
+        <!-- Export Settings Modal -->
+        <ExportSettingsModal 
+            :show="showExportModal" 
+            :results="results"
+            @close="showExportModal = false" 
+        />
     </div>
 </template>

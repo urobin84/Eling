@@ -33,7 +33,7 @@ onMounted(() => {
 
 <template>
     <button @click="toggleTheme"
-        class="p-2 rounded-full transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/10 text-eling-surface dark:text-eling-light"
+        class="p-2 rounded-full transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/10 text-eling-light-text dark:text-eling-dark-text"
         :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         <!-- Sun Icon (for Dark Mode -> show Sun to switch to light) -->
         <svg v-if="isDark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

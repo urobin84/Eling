@@ -33,6 +33,16 @@ const router = createRouter({
             component: () => import('../views/candidate/CandidateDashboard.vue')
         },
         {
+            path: '/info',
+            name: 'app-info',
+            component: () => import('../views/candidate/AppInfo.vue')
+        },
+        {
+            path: '/profile',
+            name: 'candidate-profile',
+            component: () => import('../views/candidate/CandidateProfile.vue')
+        },
+        {
             path: '/test/run',
             name: 'test-runner',
             component: TestRunner,

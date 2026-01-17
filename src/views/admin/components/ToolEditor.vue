@@ -334,7 +334,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
 
 <template>
     <div v-if="isLoading" class="flex justify-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-eling-accent"></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-eling-emerald"></div>
     </div>
 
     <div v-else-if="toolData" class="space-y-6 animate-fade-in">
@@ -342,25 +342,25 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-light">{{ toolData.tool.name }}</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">{{ toolData.tool.name }}</h2>
                     <span
-                        class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-eling-accent/10 text-eling-accent border border-eling-accent/20">
+                        class="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-eling-emerald/10 text-eling-emerald border border-eling-emerald/20">
                         {{ toolData.tool.category }}
                     </span>
                 </div>
-                <p class="text-sm text-gray-900 dark:text-eling-light/50 mt-1 font-mono">ID: #{{ toolData.tool.id }} •
+                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1 font-mono">ID: #{{ toolData.tool.id }} •
                     Type: {{
                         toolData.tool.tool_type }}</p>
             </div>
 
             <div class="flex space-x-2 bg-black/5 dark:bg-white/5 p-1 rounded-lg">
                 <button @click="activeTab = 'info'" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all"
-                    :class="activeTab === 'info' ? 'bg-eling-accent text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-light/60 hover:text-gray-900 dark:text-eling-light'">
+                    :class="activeTab === 'info' ? 'bg-eling-emerald text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-dark-text/60 hover:text-gray-900 dark:text-eling-dark-text'">
                     Information
                 </button>
                 <button @click="activeTab = 'subtests'"
                     class="px-4 py-1.5 text-xs font-medium rounded-md transition-all"
-                    :class="activeTab === 'subtests' ? 'bg-eling-accent text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-light/60 hover:text-gray-900 dark:text-eling-light'">
+                    :class="activeTab === 'subtests' ? 'bg-eling-emerald text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-dark-text/60 hover:text-gray-900 dark:text-eling-dark-text'">
                     Subtests ({{ toolData.subtests.length }})
                 </button>
             </div>
@@ -377,21 +377,21 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     <div class="lg:col-span-2 space-y-6">
                         <!-- Hero Section -->
                         <div
-                            class="bg-gradient-to-br from-eling-accent/10 to-purple-500/5 rounded-xl p-6 border border-eling-accent/20">
+                            class="bg-gradient-to-br from-eling-emerald/10 to-purple-500/5 rounded-xl p-6 border border-eling-emerald/20">
                             <div class="flex items-start gap-4">
                                 <div
-                                    class="w-16 h-16 rounded-xl bg-eling-accent/20 flex items-center justify-center shrink-0">
-                                    <span class="text-2xl font-bold text-eling-accent">{{ toolData.tool.name.charAt(0)
+                                    class="w-16 h-16 rounded-xl bg-eling-emerald/20 flex items-center justify-center shrink-0">
+                                    <span class="text-2xl font-bold text-eling-emerald">{{ toolData.tool.name.charAt(0)
                                         }}</span>
                                 </div>
                                 <div class="flex-1">
-                                    <h3 class="text-xl font-bold text-gray-900 dark:text-eling-light">{{
+                                    <h3 class="text-xl font-bold text-gray-900 dark:text-eling-dark-text">{{
                                         toolData.tool.name }}</h3>
-                                    <p class="text-sm text-gray-900 dark:text-eling-light/60 mt-1">{{
+                                    <p class="text-sm text-gray-900 dark:text-eling-dark-text/60 mt-1">{{
                                         toolData.tool.description || 'No description available' }}</p>
                                     <div class="flex flex-wrap gap-2 mt-3">
                                         <span
-                                            class="px-2 py-1 rounded-lg text-xs font-medium bg-eling-accent/10 text-eling-accent border border-eling-accent/20">
+                                            class="px-2 py-1 rounded-lg text-xs font-medium bg-eling-emerald/10 text-eling-emerald border border-eling-emerald/20">
                                             {{ toolData.tool.category }}
                                         </span>
                                         <span
@@ -407,15 +407,15 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-5 border border-black/10 dark:border-white/10">
                             <h4
-                                class="text-sm font-bold text-gray-900 dark:text-eling-light/80 mb-3 flex items-center gap-2">
-                                <svg class="w-4 h-4 text-eling-accent" fill="none" viewBox="0 0 24 24"
+                                class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-eling-emerald" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 About This Tool
                             </h4>
-                            <p class="text-sm text-gray-900 dark:text-eling-light/60 leading-relaxed">
+                            <p class="text-sm text-gray-900 dark:text-eling-dark-text/60 leading-relaxed">
                                 {{ getToolDescription(toolData.tool.name) }}
                             </p>
                         </div>
@@ -424,7 +424,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-5 border border-black/10 dark:border-white/10">
                             <h4
-                                class="text-sm font-bold text-gray-900 dark:text-eling-light/80 mb-3 flex items-center gap-2">
+                                class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-3 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -434,7 +434,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                             </h4>
                             <div class="grid grid-cols-2 gap-3">
                                 <div v-for="feature in getToolFeatures(toolData.tool.name)" :key="feature"
-                                    class="flex items-center gap-2 text-xs text-gray-900 dark:text-eling-light/60">
+                                    class="flex items-center gap-2 text-xs text-gray-900 dark:text-eling-dark-text/60">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
                                     {{ feature }}
                                 </div>
@@ -473,11 +473,11 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         <div
                             class="bg-black/5 dark:bg-white/5 rounded-xl p-4 border border-black/10 dark:border-white/10 space-y-2">
                             <h5
-                                class="text-xs font-bold text-gray-900 dark:text-eling-light/50 uppercase tracking-wider mb-3">
+                                class="text-xs font-bold text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider mb-3">
                                 Quick
                                 Actions</h5>
                             <button @click="activeTab = 'subtests'"
-                                class="w-full text-left px-3 py-2 text-xs text-gray-900 dark:text-eling-light/70 hover:bg-black/5 dark:bg-white/5 rounded-lg transition flex items-center gap-2">
+                                class="w-full text-left px-3 py-2 text-xs text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/5 dark:bg-white/5 rounded-lg transition flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -485,7 +485,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                                 Manage Subtests
                             </button>
                             <button @click="activeTab = 'preview'"
-                                class="w-full text-left px-3 py-2 text-xs text-gray-900 dark:text-eling-light/70 hover:bg-black/5 dark:bg-white/5 rounded-lg transition flex items-center gap-2">
+                                class="w-full text-left px-3 py-2 text-xs text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/5 dark:bg-white/5 rounded-lg transition flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -504,18 +504,18 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                 <!-- Add Subtest Form -->
                 <div v-if="showAddSubtest"
                     class="p-4 bg-black/5 dark:bg-white/5 rounded-lg border border-black/10 dark:border-white/10 animate-fade-in">
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light mb-4">Add New Subtest</h4>
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text mb-4">Add New Subtest</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
-                            <label class="block text-xs text-gray-900 dark:text-eling-light/50 mb-1">Name</label>
+                            <label class="block text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Name</label>
                             <input v-model="newSubtest.name" type="text" class="input-glass w-full text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-900 dark:text-eling-light/50 mb-1">Sequence</label>
+                            <label class="block text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Sequence</label>
                             <input v-model="newSubtest.sequence" type="number" class="input-glass w-full text-sm">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-900 dark:text-eling-light/50 mb-1">Time Limit
+                            <label class="block text-xs text-gray-900 dark:text-eling-dark-text/50 mb-1">Time Limit
                                 (Sec)</label>
                             <input v-model="newSubtest.timeLimit" type="number" class="input-glass w-full text-sm"
                                 placeholder="0 = Unlimited">
@@ -523,7 +523,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     </div>
                     <div class="flex justify-end gap-2">
                         <button @click="showAddSubtest = false"
-                            class="px-3 py-1.5 text-xs text-gray-900 dark:text-eling-light/70 hover:bg-black/10 dark:bg-white/10 rounded">Cancel</button>
+                            class="px-3 py-1.5 text-xs text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 rounded">Cancel</button>
                         <button @click="handleAddSubtest" class="btn-neumorphic px-4 py-1.5 text-xs">Save
                             Subtest</button>
                     </div>
@@ -545,26 +545,26 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
 
                         <div>
                             <div class="flex items-center gap-3">
-                                <span class="text-xs font-mono text-gray-900 dark:text-eling-light/30">#{{
+                                <span class="text-xs font-mono text-gray-900 dark:text-eling-dark-text/30">#{{
                                     item.subtest.sequence_order
                                     }}</span>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-eling-light">{{
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-eling-dark-text">{{
                                     item.subtest.subtest_name }}</h4>
                                 <span v-if="item.subtest.time_limit_seconds"
-                                    class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/50 border border-black/5 dark:border-white/5">
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/50 border border-black/5 dark:border-white/5">
                                     {{ Math.floor(item.subtest.time_limit_seconds / 60) }} min
                                 </span>
                                 <span v-else
-                                    class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/50 border border-black/5 dark:border-white/5">Unlimited</span>
+                                    class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/50 border border-black/5 dark:border-white/5">Unlimited</span>
                             </div>
-                            <p class="text-xs text-gray-900 dark:text-eling-light/40 mt-1 pl-7">{{ item.questions.length
+                            <p class="text-xs text-gray-900 dark:text-eling-dark-text/40 mt-1 pl-7">{{ item.questions.length
                                 }} Questions
                                 configured</p>
                         </div>
 
                         <div class="flex items-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
                             <button @click="openQuestionManager(item)"
-                                class="p-1.5 text-eling-accent hover:bg-eling-accent/10 rounded"
+                                class="p-1.5 text-eling-emerald hover:bg-eling-emerald/10 rounded"
                                 title="Manage Questions">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -583,7 +583,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
 
                     <div v-if="toolData.subtests.length === 0"
                         class="text-center py-8 border-2 border-dashed border-black/5 dark:border-white/5 rounded-lg">
-                        <p class="text-sm text-gray-900 dark:text-eling-light/30">No subtests configured for this tool.
+                        <p class="text-sm text-gray-900 dark:text-eling-dark-text/30">No subtests configured for this tool.
                         </p>
                     </div>
                 </div>
@@ -603,37 +603,37 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                 <!-- OVERVIEW MODE - Before starting test -->
                 <div v-if="previewMode === 'overview'" class="max-w-2xl mx-auto">
                     <div
-                        class="bg-gradient-to-br from-eling-accent/10 to-purple-500/10 rounded-2xl p-8 border border-eling-accent/20 text-center">
+                        class="bg-gradient-to-br from-eling-emerald/10 to-purple-500/10 rounded-2xl p-8 border border-eling-emerald/20 text-center">
                         <div
-                            class="w-20 h-20 rounded-2xl bg-eling-accent/20 flex items-center justify-center mx-auto mb-6">
-                            <span class="text-3xl font-bold text-eling-accent">{{ toolData?.tool.name.charAt(0)
+                            class="w-20 h-20 rounded-2xl bg-eling-emerald/20 flex items-center justify-center mx-auto mb-6">
+                            <span class="text-3xl font-bold text-eling-emerald">{{ toolData?.tool.name.charAt(0)
                                 }}</span>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-light mb-2">{{ toolData?.tool.name
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text mb-2">{{ toolData?.tool.name
                             }}</h2>
-                        <p class="text-sm text-gray-900 dark:text-eling-light/60 mb-6">{{ toolData?.tool.description ||
+                        <p class="text-sm text-gray-900 dark:text-eling-dark-text/60 mb-6">{{ toolData?.tool.description ||
                             'Preview tes psikologi' }}</p>
 
                         <!-- Test Info -->
                         <div class="grid grid-cols-3 gap-4 mb-8">
                             <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4">
                                 <div class="text-2xl font-bold text-blue-400">{{ toolData?.subtests.length || 0 }}</div>
-                                <div class="text-xs text-gray-900 dark:text-eling-light/50">Subtests</div>
+                                <div class="text-xs text-gray-900 dark:text-eling-dark-text/50">Subtests</div>
                             </div>
                             <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4">
                                 <div class="text-2xl font-bold text-purple-400">{{ getTotalQuestions() }}</div>
-                                <div class="text-xs text-gray-900 dark:text-eling-light/50">Questions</div>
+                                <div class="text-xs text-gray-900 dark:text-eling-dark-text/50">Questions</div>
                             </div>
                             <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4">
                                 <div class="text-2xl font-bold text-green-400">{{ getTotalTime() }}</div>
-                                <div class="text-xs text-gray-900 dark:text-eling-light/50">Minutes</div>
+                                <div class="text-xs text-gray-900 dark:text-eling-dark-text/50">Minutes</div>
                             </div>
                         </div>
 
                         <!-- Subtest List -->
                         <div class="text-left mb-8">
                             <h4
-                                class="text-xs font-bold text-gray-900 dark:text-eling-light/50 uppercase tracking-wider mb-3">
+                                class="text-xs font-bold text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider mb-3">
                                 Test
                                 Structure</h4>
                             <div class="space-y-2">
@@ -641,12 +641,12 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                                     class="bg-black/5 dark:bg-white/5 rounded-lg p-3 flex items-center justify-between">
                                     <div class="flex items-center gap-3">
                                         <span
-                                            class="w-6 h-6 rounded bg-eling-accent/10 flex items-center justify-center text-xs font-bold text-eling-accent">{{
+                                            class="w-6 h-6 rounded bg-eling-emerald/10 flex items-center justify-center text-xs font-bold text-eling-emerald">{{
                                                 idx + 1 }}</span>
-                                        <span class="text-sm text-gray-900 dark:text-eling-light">{{
+                                        <span class="text-sm text-gray-900 dark:text-eling-dark-text">{{
                                             item.subtest.subtest_name }}</span>
                                     </div>
-                                    <div class="flex items-center gap-2 text-xs text-gray-900 dark:text-eling-light/50">
+                                    <div class="flex items-center gap-2 text-xs text-gray-900 dark:text-eling-dark-text/50">
                                         <span>{{ item.questions.length }} soal</span>
                                         <span v-if="item.subtest.time_limit_seconds" class="text-orange-400">
                                             {{ Math.floor(item.subtest.time_limit_seconds / 60) }} min
@@ -671,15 +671,15 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         class="bg-black/5 dark:bg-white/5 rounded-xl p-4 mb-6 flex items-center justify-between border border-black/10 dark:border-white/10">
                         <div class="flex items-center gap-4">
                             <div class="text-sm">
-                                <span class="text-gray-900 dark:text-eling-light/50">Subtest:</span>
-                                <span class="text-gray-900 dark:text-eling-light font-bold ml-1">{{
+                                <span class="text-gray-900 dark:text-eling-dark-text/50">Subtest:</span>
+                                <span class="text-gray-900 dark:text-eling-dark-text font-bold ml-1">{{
                                     currentSubtest.subtest.subtest_name
                                     }}</span>
                             </div>
                             <div class="h-4 w-px bg-black/10 dark:bg-white/10"></div>
                             <div class="text-sm">
-                                <span class="text-gray-900 dark:text-eling-light/50">Question:</span>
-                                <span class="text-eling-accent font-bold ml-1">{{ currentQuestionIndex + 1 }}/{{
+                                <span class="text-gray-900 dark:text-eling-dark-text/50">Question:</span>
+                                <span class="text-eling-emerald font-bold ml-1">{{ currentQuestionIndex + 1 }}/{{
                                     totalQuestionsInSubtest }}</span>
                             </div>
                         </div>
@@ -703,7 +703,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
 
                     <!-- Progress Bar -->
                     <div class="h-1 bg-black/10 dark:bg-white/10 rounded-full mb-6 overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-eling-accent to-purple-500 transition-all duration-300"
+                        <div class="h-full bg-gradient-to-r from-eling-emerald to-purple-500 transition-all duration-300"
                             :style="{ width: progressPercent + '%' }"></div>
                     </div>
 
@@ -712,10 +712,10 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         class="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-2xl p-8 border border-black/10 dark:border-white/10 mb-6">
                         <div class="flex items-start gap-4 mb-6">
                             <div
-                                class="w-12 h-12 rounded-xl bg-eling-accent/20 flex items-center justify-center shrink-0">
-                                <span class="text-lg font-bold text-eling-accent">{{ currentQuestionIndex + 1 }}</span>
+                                class="w-12 h-12 rounded-xl bg-eling-emerald/20 flex items-center justify-center shrink-0">
+                                <span class="text-lg font-bold text-eling-emerald">{{ currentQuestionIndex + 1 }}</span>
                             </div>
-                            <p class="text-lg text-gray-900 dark:text-eling-light leading-relaxed flex-1">{{
+                            <p class="text-lg text-gray-900 dark:text-eling-dark-text leading-relaxed flex-1">{{
                                 currentQuestion.question_text
                                 }}</p>
                         </div>
@@ -726,14 +726,14 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                                 @click="selectAnswer(opt)"
                                 class="w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4"
                                 :class="previewAnswers[currentQuestion.id] === opt
-                                    ? 'bg-eling-accent/10 border-eling-accent text-gray-900 dark:text-eling-light'
-                                    : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-gray-900 dark:text-eling-light/70 hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10'">
+                                    ? 'bg-eling-emerald/10 border-eling-emerald text-gray-900 dark:text-eling-dark-text'
+                                    : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-gray-900 dark:text-eling-dark-text/70 hover:border-black/20 dark:border-white/20 hover:bg-black/10 dark:bg-white/10'">
                                 <span class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                                    :class="previewAnswers[currentQuestion.id] === opt ? 'bg-eling-accent text-eling-dark' : 'bg-black/10 dark:bg-white/10'">
+                                    :class="previewAnswers[currentQuestion.id] === opt ? 'bg-eling-emerald text-eling-dark' : 'bg-black/10 dark:bg-white/10'">
                                     {{ String.fromCharCode(65 + optIdx) }}
                                 </span>
                                 <span class="flex-1">{{ opt }}</span>
-                                <svg v-if="previewAnswers[currentQuestion.id] === opt" class="w-5 h-5 text-eling-accent"
+                                <svg v-if="previewAnswers[currentQuestion.id] === opt" class="w-5 h-5 text-eling-emerald"
                                     fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
                                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -748,9 +748,9 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                             <div
                                 class="bg-white dark:bg-gray-800 border-2 border-gray-400 dark:border-gray-600 shadow-xl p-6 rounded-sm min-w-max">
                                 <div class="text-center mb-4">
-                                    <h4 class="text-sm font-bold text-gray-700 dark:text-eling-light mb-2">Kraepelin
+                                    <h4 class="text-sm font-bold text-gray-700 dark:text-eling-dark-text mb-2">Kraepelin
                                         Test Preview</h4>
-                                    <p class="text-xs text-gray-500 dark:text-eling-light/50">Showing {{ Math.min(10,
+                                    <p class="text-xs text-gray-500 dark:text-eling-dark-text/50">Showing {{ Math.min(10,
                                         currentSubtest?.questions.length || 0) }} columns (paper-like layout)</p>
                                 </div>
 
@@ -809,7 +809,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
 
                                 <!-- Info -->
                                 <div class="mt-4 text-center">
-                                    <p class="text-xs text-gray-500 dark:text-eling-light/50">
+                                    <p class="text-xs text-gray-500 dark:text-eling-dark-text/50">
                                         Total {{ currentSubtest?.questions.length || 0 }} columns × {{
                                             (currentQuestion.options?.numbers || []).length }} numbers each
                                     </p>
@@ -821,7 +821,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         </div>
 
                         <!-- Other question types placeholder -->
-                        <div v-else class="text-center py-8 text-gray-900 dark:text-eling-light/50">
+                        <div v-else class="text-center py-8 text-gray-900 dark:text-eling-dark-text/50">
                             <p class="text-sm">Question type: {{ currentQuestion.question_type }}</p>
                             <p class="text-xs mt-2">Preview not available for this question type</p>
                         </div>
@@ -830,36 +830,36 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     <!-- Navigation Buttons -->
                     <div class="flex justify-between items-center">
                         <button @click="prevQuestion" :disabled="currentQuestionIndex === 0"
-                            class="px-6 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/70 hover:bg-black/10 dark:bg-white/10">
+                            class="px-6 py-3 rounded-xl text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10">
                             ← Previous
                         </button>
 
                         <div class="flex gap-1">
                             <!-- Show first page indicator if not in window -->
                             <button v-if="paginationWindow[0] > 1" @click="currentQuestionIndex = 0"
-                                class="w-8 h-8 rounded text-xs font-medium transition-all bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/50 hover:bg-black/10 dark:bg-white/10">
+                                class="w-8 h-8 rounded text-xs font-medium transition-all bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/50 hover:bg-black/10 dark:bg-white/10">
                                 1
                             </button>
                             <span v-if="paginationWindow[0] > 2"
-                                class="flex items-center px-1 text-gray-900 dark:text-eling-light/50">...</span>
+                                class="flex items-center px-1 text-gray-900 dark:text-eling-dark-text/50">...</span>
 
                             <!-- Pagination window -->
                             <button v-for="i in paginationWindow" :key="i" @click="currentQuestionIndex = i - 1"
                                 class="w-8 h-8 rounded text-xs font-medium transition-all"
                                 :class="currentQuestionIndex === i - 1
-                                    ? 'bg-eling-accent text-eling-dark'
+                                    ? 'bg-eling-emerald text-eling-dark'
                                     : previewAnswers[currentSubtest.questions[i - 1]?.id]
                                         ? 'bg-green-500/20 text-green-400'
-                                        : 'bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/50 hover:bg-black/10 dark:bg-white/10'">
+                                        : 'bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/50 hover:bg-black/10 dark:bg-white/10'">
                                 {{ i }}
                             </button>
 
                             <!-- Show last page indicator if not in window -->
                             <span v-if="paginationWindow[paginationWindow.length - 1] < totalQuestionsInSubtest - 1"
-                                class="flex items-center px-1 text-gray-900 dark:text-eling-light/50">...</span>
+                                class="flex items-center px-1 text-gray-900 dark:text-eling-dark-text/50">...</span>
                             <button v-if="paginationWindow[paginationWindow.length - 1] < totalQuestionsInSubtest"
                                 @click="currentQuestionIndex = totalQuestionsInSubtest - 1"
-                                class="w-8 h-8 rounded text-xs font-medium transition-all bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/50 hover:bg-black/10 dark:bg-white/10">
+                                class="w-8 h-8 rounded text-xs font-medium transition-all bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/50 hover:bg-black/10 dark:bg-white/10">
                                 {{ totalQuestionsInSubtest }}
                             </button>
                         </div>
@@ -867,7 +867,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         <button @click="nextQuestion" class="px-6 py-3 rounded-xl text-sm font-medium transition-all"
                             :class="currentQuestionIndex === totalQuestionsInSubtest - 1
                                 ? 'bg-green-500 text-gray-900 dark:text-white hover:bg-green-600'
-                                : 'bg-eling-accent text-eling-dark hover:bg-eling-accent/90'">
+                                : 'bg-eling-emerald text-eling-dark hover:bg-eling-emerald/90'">
                             {{ currentQuestionIndex === totalQuestionsInSubtest - 1 ? 'Finish Subtest →' : 'Next →' }}
                         </button>
                     </div>
@@ -884,16 +884,16 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-light mb-2">Preview Completed!</h2>
-                        <p class="text-sm text-gray-900 dark:text-eling-light/60 mb-6">Berikut adalah hasil preview {{
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text mb-2">Preview Completed!</h2>
+                        <p class="text-sm text-gray-900 dark:text-eling-dark-text/60 mb-6">Berikut adalah hasil preview {{
                             toolData?.tool.name
                             }}</p>
 
                         <!-- Score Display -->
                         <div class="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-6">
-                            <div class="text-5xl font-bold text-eling-accent mb-2">{{ calculateScore().percentage }}%
+                            <div class="text-5xl font-bold text-eling-emerald mb-2">{{ calculateScore().percentage }}%
                             </div>
-                            <div class="text-sm text-gray-900 dark:text-eling-light/50">{{ calculateScore().correct }} /
+                            <div class="text-sm text-gray-900 dark:text-eling-dark-text/50">{{ calculateScore().correct }} /
                                 {{
                                     calculateScore().total }} Correct</div>
                         </div>
@@ -902,18 +902,18 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     <!-- Detailed Results per Subtest -->
                     <div
                         class="bg-black/5 dark:bg-white/5 rounded-xl p-6 border border-black/10 dark:border-white/10 mb-6">
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light mb-4">📊 Hasil per Subtest</h4>
+                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text mb-4">📊 Hasil per Subtest</h4>
                         <div class="space-y-3">
                             <div v-for="(detail, subtestName) in calculateScore().details" :key="subtestName"
                                 class="flex items-center justify-between p-3 bg-black/5 dark:bg-white/5 rounded-lg">
-                                <span class="text-sm text-gray-900 dark:text-eling-light">{{ subtestName }}</span>
+                                <span class="text-sm text-gray-900 dark:text-eling-dark-text">{{ subtestName }}</span>
                                 <div class="flex items-center gap-3">
                                     <div class="w-32 h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
-                                        <div class="h-full bg-eling-accent transition-all"
+                                        <div class="h-full bg-eling-emerald transition-all"
                                             :style="{ width: (detail.total > 0 ? (detail.correct / detail.total) * 100 : 0) + '%' }">
                                         </div>
                                     </div>
-                                    <span class="text-xs text-gray-900 dark:text-eling-light/50 w-16 text-right">{{
+                                    <span class="text-xs text-gray-900 dark:text-eling-dark-text/50 w-16 text-right">{{
                                         detail.correct }}/{{
                                             detail.total }}</span>
                                 </div>
@@ -924,11 +924,11 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     <!-- Tool-specific interpretation based on category -->
                     <div
                         class="bg-black/5 dark:bg-white/5 rounded-xl p-6 border border-black/10 dark:border-white/10 mb-6">
-                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-light mb-4">🎯 Interpretasi {{
+                        <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text mb-4">🎯 Interpretasi {{
                             toolData?.tool.category
                             }}</h4>
                         <div v-if="toolData?.tool.category === 'kognitif'"
-                            class="text-sm text-gray-900 dark:text-eling-light/70">
+                            class="text-sm text-gray-900 dark:text-eling-dark-text/70">
                             <p class="mb-2">Berdasarkan hasil tes kognitif:</p>
                             <div class="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
                                 <div v-if="calculateScore().percentage >= 80" class="text-blue-300">
@@ -946,13 +946,13 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                             </div>
                         </div>
                         <div v-else-if="toolData?.tool.category === 'kepribadian'"
-                            class="text-sm text-gray-900 dark:text-eling-light/70">
+                            class="text-sm text-gray-900 dark:text-eling-dark-text/70">
                             <p class="mb-2">Profil kepribadian berdasarkan respons:</p>
                             <div class="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20 text-purple-300">
                                 Analisis kepribadian memerlukan interpretasi lebih lanjut oleh psikolog profesional.
                             </div>
                         </div>
-                        <div v-else class="text-sm text-gray-900 dark:text-eling-light/70">
+                        <div v-else class="text-sm text-gray-900 dark:text-eling-dark-text/70">
                             <p>Hasil tes ini memerlukan interpretasi profesional untuk analisis lebih lanjut.</p>
                         </div>
                     </div>
@@ -962,7 +962,7 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                             🔄 Ulangi Preview
                         </button>
                         <button @click="activeTab = 'subtests'"
-                            class="px-6 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-light/70 hover:bg-black/10 dark:bg-white/10 text-sm">
+                            class="px-6 py-3 rounded-xl bg-black/5 dark:bg-white/5 text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 text-sm">
                             ← Kembali ke Subtests
                         </button>
                     </div>
@@ -972,14 +972,14 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                 <div v-else-if="!toolData?.subtests.length" class="text-center py-16">
                     <div
                         class="w-16 h-16 rounded-2xl bg-black/5 dark:bg-white/5 flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-gray-900 dark:text-eling-light/30" fill="none" viewBox="0 0 24 24"
+                        <svg class="w-8 h-8 text-gray-900 dark:text-eling-dark-text/30" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                     </div>
-                    <h4 class="text-lg font-bold text-gray-900 dark:text-eling-light/50 mb-2">No Subtests Yet</h4>
-                    <p class="text-sm text-gray-900 dark:text-eling-light/30 mb-4">Create subtests to start building
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-eling-dark-text/50 mb-2">No Subtests Yet</h4>
+                    <p class="text-sm text-gray-900 dark:text-eling-dark-text/30 mb-4">Create subtests to start building
                         your test</p>
                     <button @click="activeTab = 'subtests'" class="btn-neumorphic text-xs py-2 px-4">Go to
                         Subtests</button>

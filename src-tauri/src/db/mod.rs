@@ -1,9 +1,14 @@
 pub mod models;
 pub mod seed;
+pub mod candidate;
+pub mod admin_sync;
 
 use sqlx::{SqlitePool, Error, Row};
 use self::models::*;
 
+pub use candidate::CandidateDatabase;
+
+#[derive(Clone)]
 pub struct Database {
     pool: SqlitePool,
 }

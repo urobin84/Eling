@@ -427,8 +427,9 @@ onUnmounted(() => {
                     </div>
 
                     <h2 class="text-2xl font-bold mb-2">{{ isPractice ? 'Latihan Selesai!' : 'Tes Selesai!' }}</h2>
-                    <p class="text-white/60 mb-6">{{ isPractice ? 'Anda siap untuk tes utama' : 'Terima kasih telah
-                        menyelesaikan tes Kraepelin' }}</p>
+                    <p class="text-white/60 mb-6">
+                        {{ isPractice ? 'Anda siap untuk tes utama' : 'Terima kasih telah menyelesaikan tes Kraepelin' }}
+                    </p>
 
                     <!-- Stats Summary -->
                     <div class="grid grid-cols-3 gap-4 mb-6">

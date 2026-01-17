@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
 import { useTestStore } from '../stores/test';
+import { useRecording } from '../composables/useRecording';
 
 const store = useTestStore();
+const { isRecording, startRecording, stopRecording } = useRecording();
 
 // Test flow states
 type TestPhase = 'welcome' | 'instructions' | 'subtest-intro' | 'testing' | 'subtest-complete' | 'completed';
@@ -109,9 +111,25 @@ function stopTimer() {
   }
 }
 
+// Session ID for recording
+const sessionId = ref(`session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+
 // Navigation functions
-function startTest() {
+async function startTest() {
   testPhase.value = 'instructions';
+  
+  // Start recording
+  const recordingStarted = await startRecording({
+    sessionId: sessionId.value,
+    userId: 1, // TODO: Get from auth store
+    username: 'Test User', // TODO: Get from auth store
+    testName: testData.value.tool.name,
+    eventName: undefined
+  });
+  
+  if (!recordingStarted) {
+    console.warn('Failed to start recording, but continuing with test');
+  }
 }
 
 function startSubtest() {
@@ -162,7 +180,12 @@ function continueToInstructions() {
   testPhase.value = 'subtest-intro';
 }
 
-function resetTest() {
+async function resetTest() {
+  // Stop recording if active
+  if (isRecording.value) {
+    await stopRecording();
+  }
+  
   testPhase.value = 'welcome';
   currentSubtestIndex.value = 0;
   currentQuestionIndex.value = 0;
@@ -181,8 +204,12 @@ function calculateScore() {
   };
 }
 
-onUnmounted(() => {
+onUnmounted(async () => {
   stopTimer();
+  // Stop recording on unmount
+  if (isRecording.value) {
+    await stopRecording();
+  }
 });
 </script>
 

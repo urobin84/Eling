@@ -66,10 +66,10 @@ onUnmounted(() => {
     <div
       class="glass-panel p-1.5 flex items-center space-x-2 transition-all duration-300 opacity-50 group-hover:opacity-100 hover:scale-105 pointer-events-auto cursor-pointer">
       <div class="relative flex items-center justify-center w-3 h-3">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-eling-accent opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-eling-accent"></span>
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-eling-emerald opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-eling-emerald"></span>
       </div>
-      <span class="text-[10px] font-mono text-eling-light font-bold hidden group-hover:block">SECURE</span>
+      <span class="text-[10px] font-mono text-eling-dark-text font-bold hidden group-hover:block">SECURE</span>
     </div>
 
     <!-- Hover Preview (Only on hover) -->
@@ -78,7 +78,7 @@ onUnmounted(() => {
       <img v-if="frameData" :src="'data:image/jpeg;base64,' + frameData"
         class="w-full h-full object-cover opacity-90" />
       <div v-else
-        class="w-full h-full bg-black/50 flex items-center justify-center text-xs text-eling-light/50 font-mono">
+        class="w-full h-full bg-black/50 flex items-center justify-center text-xs text-eling-dark-text/50 font-mono">
         NO SIGNAL
       </div>
     </div>
