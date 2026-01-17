@@ -353,14 +353,14 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                         toolData.tool.tool_type }}</p>
             </div>
 
-            <div class="flex space-x-2 bg-black/5 dark:bg-white/5 p-1 rounded-lg">
-                <button @click="activeTab = 'info'" class="px-4 py-1.5 text-xs font-medium rounded-md transition-all"
-                    :class="activeTab === 'info' ? 'bg-eling-emerald text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-dark-text/60 hover:text-gray-900 dark:text-eling-dark-text'">
+            <div class="flex space-x-2 bg-black/5 dark:bg-white/5 p-1 rounded-xl">
+                <button @click="activeTab = 'info'" class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all"
+                    :class="activeTab === 'info' ? 'bg-eling-emerald text-white shadow-md' : 'text-gray-900 dark:text-eling-dark-text/60 hover:bg-black/5 dark:hover:bg-white/5'">
                     Information
                 </button>
                 <button @click="activeTab = 'subtests'"
-                    class="px-4 py-1.5 text-xs font-medium rounded-md transition-all"
-                    :class="activeTab === 'subtests' ? 'bg-eling-emerald text-eling-dark shadow-sm' : 'text-gray-900 dark:text-eling-dark-text/60 hover:text-gray-900 dark:text-eling-dark-text'">
+                    class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all"
+                    :class="activeTab === 'subtests' ? 'bg-eling-emerald text-white shadow-md' : 'text-gray-900 dark:text-eling-dark-text/60 hover:bg-black/5 dark:hover:bg-white/5'">
                     Subtests ({{ toolData.subtests.length }})
                 </button>
             </div>
