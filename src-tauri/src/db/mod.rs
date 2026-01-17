@@ -6,7 +6,7 @@ pub mod admin_sync;
 use sqlx::{SqlitePool, Error, Row};
 use self::models::*;
 
-pub use candidate::CandidateDatabase;
+
 
 #[derive(Clone)]
 pub struct Database {
@@ -253,7 +253,7 @@ impl Database {
                 0 as score,
                 0 as raw_score,
                 NULL as percentile,
-                NULL as interpretation,
+                json_extract(r.interpretations, '$.ai_review') as interpretation,
                 s.status as status,
                 r.generated_at as completed_at
             FROM reports r
@@ -592,4 +592,28 @@ impl Database {
         })
     }
 
+    // --- AI Review ---
+    pub async fn update_report_ai_review(&self, report_id: i64, review: &str) -> Result<(), Error> {
+        // Use json_set to update the 'ai_review' key in the interpretations JSON column
+        // If interpretations is null, we initialize it as an object
+        sqlx::query(
+            r#"
+            UPDATE reports 
+            SET interpretations = json_set(COALESCE(interpretations, '{}'), '$.ai_review', ?)
+            WHERE id = ?
+            "#
+        )
+        .bind(review)
+        .bind(report_id)
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
+    pub async fn get_report_by_id(&self, report_id: i64) -> Result<Report, Error> {
+        sqlx::query_as::<_, Report>("SELECT * FROM reports WHERE id = ?")
+            .bind(report_id)
+            .fetch_one(&self.pool)
+            .await
+    }
 }

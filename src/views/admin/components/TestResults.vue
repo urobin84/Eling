@@ -55,6 +55,7 @@ const itemsPerPage = ref(10);
 const selectedResult = ref<TestResult | null>(null);
 const showDetailModal = ref(false);
 const showExportModal = ref(false);
+const isGeneratingReview = ref(false);
 
 // Computed
 const filteredResults = computed(() => {
@@ -142,6 +143,30 @@ function getScoreColor(percentile: number | undefined) {
 
 function exportResults() {
     showExportModal.value = true;
+}
+
+async function generateAiReview() {
+    if (!selectedResult.value) return;
+
+    isGeneratingReview.value = true;
+    try {
+        const review = await invoke('generate_ai_review', { resultId: selectedResult.value.id });
+        
+        // Update local state
+        selectedResult.value.interpretation = review as string;
+        
+        // Update in list as well
+        const idx = results.value.findIndex(r => r.id === selectedResult.value?.id);
+        if (idx !== -1) {
+            results.value[idx].interpretation = review as string;
+        }
+
+    } catch (e) {
+        alert("Failed to generate AI review: " + e);
+        console.error(e);
+    } finally {
+        isGeneratingReview.value = false;
+    }
 }
 
 onMounted(fetchData);
@@ -412,9 +437,35 @@ onMounted(fetchData);
                         </div>
                     </div>
 
-                    <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 mb-6">
-                        <div class="text-xs text-gray-900 dark:text-white/50 uppercase mb-2">Interpretation</div>
-                        <div class="text-gray-900 dark:text-white">{{ selectedResult.interpretation || 'No interpretation available' }}</div>
+                    <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 mb-6 relative group">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-xs text-gray-900 dark:text-white/50 uppercase">Interpretation</div>
+                            <button v-if="selectedResult.interpretation" @click="generateAiReview" 
+                                :disabled="isGeneratingReview"
+                                class="text-[10px] text-eling-emerald hover:text-white transition-colors opacity-0 group-hover:opacity-100 flex items-center">
+                                <span v-if="isGeneratingReview" class="animate-spin mr-1">⟳</span>
+                                {{ isGeneratingReview ? 'Regenerating...' : 'Regenerate with AI' }}
+                            </button>
+                        </div>
+                        
+                        <div v-if="selectedResult.interpretation" class="text-gray-900 dark:text-white text-sm leading-relaxed whitespace-pre-line">
+                            {{ selectedResult.interpretation }}
+                        </div>
+                        <div v-else class="flex flex-col items-center justify-center py-6">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">No interpretation available yet.</p>
+                            <button @click="generateAiReview" :disabled="isGeneratingReview"
+                                class="btn-neumorphic text-sm py-2 px-6 flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all">
+                                <svg v-if="!isGeneratingReview" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <svg v-else class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {{ isGeneratingReview ? 'Analyzing Scores...' : 'Generate AI Analysis (Gemma 2 2B)' }}
+                            </button>
+                            <p class="text-[10px] text-gray-400 mt-2 font-mono">Powered by Local LLM</p>
+                        </div>
                     </div>
 
                     <div class="flex justify-between items-center text-xs text-gray-900 dark:text-white/40">

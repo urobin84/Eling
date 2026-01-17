@@ -100,6 +100,7 @@ pub fn run() {
             commands::dashboard::create_candidate,
             commands::dashboard::get_my_sessions,
             commands::dashboard::get_test_results,
+            commands::dashboard::generate_ai_review,
             commands::tools::get_tool_structure,
             commands::tools::create_subtest,
             commands::tools::delete_subtest,

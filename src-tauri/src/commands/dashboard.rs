@@ -2,7 +2,50 @@ use tauri::State;
 use crate::db::Database;
 use crate::db::models::{User, Event, Session};
 use bcrypt;
+use serde_json::json;
 
+#[tauri::command]
+pub async fn generate_ai_review(db: State<'_, Database>, result_id: i64) -> Result<String, String> {
+    // 1. Fetch Report Data
+    let report = db.get_report_by_id(result_id).await.map_err(|e| e.to_string())?;
+    
+    // 2. Fetch Context (Candidate Name, Tool, etc.) - We might need to join queries or just use what we have.
+    // get_report_by_id only gives raw report. We can use the scores JSON.
+    // For a better prompt, we'd ideally want candidate name and tool name, but report has session_id.
+    // Optimization: Just analyze the scores for now.
+    
+    let scores = &report.scores;
+    
+    // Construct Prompt
+    let prompt = format!(
+        "You are an expert psychological assessment assistant. Analyze the following test scores and provide a concise, professional interpretation for the candidate. Focus on strengths and areas for development.\n\nScores: {}\n\nInterpretation:",
+        scores
+    );
+
+    // 3. Call Ollama (gemma2:2b)
+    let client = reqwest::Client::new();
+    let res = client.post("http://localhost:11434/api/generate")
+        .json(&json!({
+            "model": "gemma2:2b",
+            "prompt": prompt,
+            "stream": false
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("Failed to connect to AI engine: {}", e))?;
+        
+    if !res.status().is_success() {
+        return Err(format!("AI Engine returned error: {}", res.status()));
+    }
+    
+    let body: serde_json::Value = res.json().await.map_err(|e| e.to_string())?;
+    let review = body["response"].as_str().unwrap_or("No response generated").to_string();
+
+    // 4. Save Review
+    db.update_report_ai_review(result_id, &review).await.map_err(|e| e.to_string())?;
+
+    Ok(review)
+}
 #[tauri::command]
 pub async fn get_all_users(db: State<'_, Database>) -> Result<Vec<User>, String> {
     db.get_all_users().await.map_err(|e| e.to_string())
