@@ -15,6 +15,7 @@ import TestResults from './components/TestResults.vue';
 import ProfileSettings from './components/ProfileSettings.vue';
 import EventDetailModal from './components/EventDetailModal.vue';
 import CameraMonitoring from './components/CameraMonitoring.vue';
+import UserManagement from './components/UserManagement.vue';
 
 // Types
 interface User {
@@ -231,6 +232,15 @@ onMounted(fetchData);
         <!-- Camera Monitoring View -->
         <div v-else-if="currentView === 'monitoring'">
             <CameraMonitoring />
+        </div>
+
+        <!-- User Management View -->
+        <div v-else-if="currentView === 'user_management'">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">User Management</h2>
+                <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Manage system administrators, proctors, and other users.</p>
+            </div>
+            <UserManagement :users="users" @refresh="fetchData" />
         </div>
 
         <!-- Tool Editor Views -->
