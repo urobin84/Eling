@@ -8,7 +8,7 @@
 
   /* Light Mode (Siang/Fokus - Kejujuran Batin) */
   body {
-    @apply font-body antialiased transition-colors duration-300;
+    @apply font-sans antialiased transition-colors duration-300;
     background: linear-gradient(135deg, #F8FAFD 0%, #EDF2FA 100%);
     color: #1F1F1F;
   }
@@ -47,7 +47,7 @@
 
   /* Glassmorphism - The Floating Dashboard */
   .glass-panel {
-    @apply backdrop-blur-glass border rounded-3xl shadow-xl transition-all duration-300;
+    @apply backdrop-blur-md border rounded-3xl shadow-xl transition-all duration-300;
 
     /* Light mode: Opasitas putih 70% */
     background: rgba(255, 255, 255, 0.7);
@@ -56,7 +56,7 @@
 
   html.dark .glass-panel {
     /* Dark mode: Opasitas hitam 60% */
-    background: rgba(30, 31, 32, 0.6);
+    background: rgba(19, 19, 20, 0.8);
     border-color: rgba(227, 227, 227, 0.1);
   }
 
@@ -72,27 +72,73 @@
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
   }
 
-  /* Input with Glass Effect */
+  /* Input with Glass Effect - Refined for "Gemini" Theme */
   .input-glass {
-    @apply rounded-xl px-4 py-2 focus:outline-none focus:ring-2 transition-all;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(31, 31, 31, 0.1);
+    @apply rounded-full px-5 py-2.5 focus:outline-none focus:ring-2 transition-all font-sans text-sm;
+
+    /* Light Mode: Filled, Soft Gray/Blue */
+    background: #F0F4F9;
+    border: 1px solid transparent;
     color: #1F1F1F;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  }
+
+  .input-glass::placeholder {
+    color: #8E918F;
+    /* Google Material Secondary Text */
   }
 
   .input-glass:focus {
-    @apply ring-eling-emerald border-transparent;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+    @apply ring-2 ring-eling-emerald border-transparent bg-white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Elevated on focus */
   }
 
+  /* Dark Mode */
   html.dark .input-glass {
-    background: rgba(30, 31, 32, 0.5);
-    border-color: rgba(227, 227, 227, 0.1);
+    background: #1E1F20;
+    /* Surface color */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #E3E3E3;
+    box-shadow: none;
+  }
+
+  html.dark .input-glass:focus {
+    background: #131314;
+    border-color: #10B981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
   }
 
   html.dark .input-glass::placeholder {
-    color: rgba(227, 227, 227, 0.5);
+    color: #767779;
+  }
+
+  /* Date Input - Ensure calendar picker is visible in Tauri WebView */
+  input[type="date"].input-glass {
+    @apply rounded-xl;
+    /* Less rounded for date inputs */
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    padding-right: 2.5rem;
+    /* Space for calendar icon */
+  }
+
+  input[type="date"].input-glass::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0.75rem;
+    cursor: pointer;
+    opacity: 0.7;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  input[type="date"].input-glass::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+
+  html.dark input[type="date"].input-glass::-webkit-calendar-picker-indicator {
+    filter: invert(1);
   }
 
   /* Bento Box Card (Kotak Soal) */
@@ -166,5 +212,121 @@
   html.dark .camera-indicator .text {
     color: #10B981;
     text-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+
+  /* Element Plus Date Picker Custom Styling */
+  .el-date-editor {
+    @apply w-full;
+  }
+
+  .el-date-editor.el-input {
+    @apply rounded-full;
+  }
+
+  .el-date-editor .el-input__wrapper {
+    @apply rounded-full px-5 py-2.5 transition-all;
+    background: #F0F4F9;
+    border: 1px solid transparent;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+  }
+
+  .el-date-editor .el-input__wrapper:hover,
+  .el-date-editor .el-input__wrapper.is-focus {
+    background: #FFFFFF;
+    border-color: #10B981;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 0 0 2px rgba(16, 185, 129, 0.1);
+  }
+
+  .el-date-editor .el-input__inner {
+    @apply text-sm;
+    color: #1F1F1F;
+  }
+
+  .el-date-editor .el-input__inner::placeholder {
+    color: #8E918F;
+  }
+
+  .el-date-editor .el-input__prefix,
+  .el-date-editor .el-input__suffix {
+    color: #8E918F;
+  }
+
+  /* Dark Mode for Element Plus Date Picker */
+  html.dark .el-date-editor .el-input__wrapper {
+    background: #1E1F20;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+  }
+
+  html.dark .el-date-editor .el-input__wrapper:hover,
+  html.dark .el-date-editor .el-input__wrapper.is-focus {
+    background: #131314;
+    border-color: #10B981;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+  }
+
+  html.dark .el-date-editor .el-input__inner {
+    color: #E3E3E3;
+  }
+
+  html.dark .el-date-editor .el-input__inner::placeholder {
+    color: #767779;
+  }
+
+  html.dark .el-date-editor .el-input__prefix,
+  html.dark .el-date-editor .el-input__suffix {
+    color: #767779;
+  }
+
+  /* Date Picker Dropdown Panel */
+  .el-picker__popper {
+    @apply rounded-2xl shadow-2xl;
+  }
+
+  .el-picker__popper .el-picker-panel {
+    background: #FFFFFF;
+    border: 1px solid rgba(31, 31, 31, 0.1);
+  }
+
+  html.dark .el-picker__popper .el-picker-panel {
+    background: #1E1F20;
+    border-color: rgba(227, 227, 227, 0.1);
+  }
+
+  /* Date Picker Header */
+  .el-date-picker__header {
+    color: #1F1F1F;
+  }
+
+  html.dark .el-date-picker__header {
+    color: #E3E3E3;
+  }
+
+  /* Date Cells */
+  .el-date-table td.available:hover {
+    color: #10B981;
+  }
+
+  .el-date-table td.today span {
+    color: #10B981;
+    font-weight: 600;
+  }
+
+  .el-date-table td.current:not(.disabled) span {
+    background-color: #10B981;
+    color: white;
+  }
+
+  html.dark .el-date-table td {
+    color: #E3E3E3;
+  }
+
+  html.dark .el-date-table td.available:hover {
+    color: #10B981;
+  }
+
+  /* Disabled dates */
+  .el-date-table td.disabled {
+    opacity: 0.3;
   }
 }
