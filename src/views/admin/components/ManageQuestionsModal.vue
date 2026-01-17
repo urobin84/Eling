@@ -142,18 +142,18 @@ async function handleDeleteQuestion(id: number) {
 
 <template>
     <Teleport to="body">
-        <div v-if="show" class="fixed inset-0 z-[9999] grid place-items-center bg-black/80 backdrop-blur-sm p-4">
+        <div v-if="show" class="fixed inset-0 z-[9999] grid place-items-center bg-gray-200/50 dark:bg-black/80 backdrop-blur-sm p-4 transition-colors duration-300">
             <div
-                class="bg-[#1a1f2e] border border-white/10 rounded-xl w-full max-w-6xl max-h-[95vh] flex flex-col shadow-2xl">
+                class="bg-eling-light-card dark:bg-eling-dark-card border border-gray-200 dark:border-white/10 rounded-xl w-full max-w-6xl max-h-[95vh] flex flex-col shadow-2xl transition-colors duration-300">
 
                 <!-- Header -->
-                <div class="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+                <div class="p-6 border-b border-gray-200 dark:border-white/5 flex justify-between items-center bg-gray-50/50 dark:bg-white/5">
                     <div>
-                        <h3 class="text-xl font-bold text-eling-light">Manage Questions</h3>
-                        <p class="text-sm text-eling-light/50 font-mono mt-1">SUBTEST: {{ subtestName }}</p>
+                        <h3 class="text-xl font-bold text-eling-light-text dark:text-eling-dark-text">Manage Questions</h3>
+                        <p class="text-sm text-eling-light-subtext dark:text-eling-dark-text/50 font-mono mt-1">SUBTEST: {{ subtestName }}</p>
                     </div>
                     <button @click="$emit('close')"
-                        class="p-2 hover:bg-white/10 rounded-full transition-colors text-eling-light/70">
+                        class="p-2 hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-colors text-eling-light-text/70 dark:text-eling-dark-text/70">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />
@@ -165,28 +165,28 @@ async function handleDeleteQuestion(id: number) {
                 <div class="flex-1 overflow-hidden flex flex-col md:flex-row">
 
                     <!-- List (Left) -->
-                    <div class="flex-1 overflow-y-auto p-6 space-y-4 border-r border-white/5">
-                        <h4 class="text-sm font-bold text-eling-light/70 uppercase tracking-wider mb-4">Existing
+                    <div class="flex-1 overflow-y-auto p-6 space-y-4 border-r border-gray-200 dark:border-white/5 bg-eling-light-bg dark:bg-transparent">
+                        <h4 class="text-sm font-bold text-eling-light-text/70 dark:text-eling-dark-text/70 uppercase tracking-wider mb-4">Existing
                             Questions
                             ({{ existingQuestions.length }})</h4>
 
                         <div v-if="existingQuestions.length === 0"
-                            class="text-center py-12 border-2 border-dashed border-white/5 rounded-lg">
-                            <p class="text-sm text-eling-light/30">No questions yet.</p>
+                            class="text-center py-12 border-2 border-dashed border-gray-300 dark:border-white/5 rounded-lg">
+                            <p class="text-sm text-eling-light-subtext dark:text-eling-dark-text/30">No questions yet.</p>
                         </div>
 
                         <div v-for="(q, idx) in sortedQuestions" :key="q.id"
-                            class="p-4 bg-white/5 rounded-lg border border-white/5 group hover:border-eling-accent/30 transition-all">
+                            class="p-4 bg-white dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/5 group hover:border-eling-emerald/30 transition-all shadow-sm dark:shadow-none">
                             <div class="flex justify-between items-start gap-4">
                                 <div class="flex gap-3">
                                     <span
-                                        class="bg-black/40 px-2 py-1 rounded text-xs font-mono text-eling-light/50 h-fit">#{{
+                                        class="bg-gray-100 dark:bg-black/40 px-2 py-1 rounded text-xs font-mono text-eling-light-subtext dark:text-eling-dark-text/50 h-fit">#{{
                                             idx + 1 }}</span>
                                     <div>
-                                        <p class="text-sm text-eling-light font-medium">{{ q.question_text }}</p>
+                                        <p class="text-sm text-eling-light-text dark:text-eling-dark-text font-medium">{{ q.question_text }}</p>
                                         <div class="flex flex-wrap gap-2 mt-2">
                                             <span v-for="opt in q.options?.choices" :key="opt"
-                                                class="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-eling-light/60 border border-white/5">
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/5 text-eling-light-subtext dark:text-eling-dark-text/60 border border-gray-200 dark:border-white/5">
                                                 {{ opt }}
                                             </span>
                                         </div>
@@ -194,14 +194,14 @@ async function handleDeleteQuestion(id: number) {
                                 </div>
                                 <div class="flex gap-2">
                                     <button @click="handleEditQuestion(q)"
-                                        class="text-blue-400 hover:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                        class="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity p-1">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
                                     <button @click="handleDeleteQuestion(q.id)"
-                                        class="text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                                        class="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity p-1">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -213,9 +213,9 @@ async function handleDeleteQuestion(id: number) {
                     </div>
 
                     <!-- Add Form (Right) -->
-                    <div class="w-full md:w-1/3 bg-black/20 p-6 overflow-y-auto">
+                    <div class="w-full md:w-1/3 bg-gray-50 dark:bg-black/20 p-6 overflow-y-auto border-l border-gray-200 dark:border-white/5">
                         <h4 class="text-sm font-bold uppercase tracking-wider mb-6 flex items-center justify-between"
-                            :class="editingQuestionId ? 'text-blue-400' : 'text-eling-accent'">
+                            :class="editingQuestionId ? 'text-blue-500 dark:text-blue-400' : 'text-eling-emerald'">
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -224,20 +224,20 @@ async function handleDeleteQuestion(id: number) {
                                 {{ editingQuestionId ? 'Edit Question' : 'Add Question' }}
                             </div>
                             <button v-if="editingQuestionId" @click="cancelEdit"
-                                class="text-xs px-2 py-1 bg-white/10 rounded hover:bg-white/20">
+                                class="text-xs px-2 py-1 bg-gray-200 dark:bg-white/10 rounded hover:bg-gray-300 dark:hover:bg-white/20 text-eling-light-text dark:text-eling-dark-text">
                                 Cancel
                             </button>
                         </h4>
 
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-xs text-eling-light/50 mb-1">Question Text</label>
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Question Text</label>
                                 <textarea v-model="newQuestion.text" rows="3" class="input-glass w-full text-sm"
                                     placeholder="e.g. 2, 4, 8, ..."></textarea>
                             </div>
 
                             <div>
-                                <label class="block text-xs text-eling-light/50 mb-1">Type</label>
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Type</label>
                                 <select v-model="newQuestion.type" class="input-glass w-full text-sm">
                                     <option value="multiple_choice">Multiple Choice</option>
                                     <option value="true_false">True / False</option>
@@ -245,14 +245,14 @@ async function handleDeleteQuestion(id: number) {
                             </div>
 
                             <div>
-                                <label class="block text-xs text-eling-light/50 mb-1">Choices (Comma Separated)</label>
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Choices (Comma Separated)</label>
                                 <textarea v-model="newQuestion.optionsText" rows="3" class="input-glass w-full text-sm"
                                     placeholder="e.g. 16, 20, 24, 32"></textarea>
-                                <p class="text-[10px] text-eling-light/30 mt-1">Separate options with commas.</p>
+                                <p class="text-[10px] text-eling-light-subtext/70 dark:text-eling-dark-text/30 mt-1">Separate options with commas.</p>
                             </div>
 
                             <div>
-                                <label class="block text-xs text-eling-light/50 mb-1">Correct Answer (Exact
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Correct Answer (Exact
                                     Match)</label>
                                 <input v-model="newQuestion.correctAnswer" type="text"
                                     class="input-glass w-full text-sm" placeholder="e.g. 16">
@@ -260,13 +260,13 @@ async function handleDeleteQuestion(id: number) {
 
                             <!-- Image Upload -->
                             <div>
-                                <label class="block text-xs text-eling-light/50 mb-1">Image (Optional)</label>
+                                <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Image (Optional)</label>
                                 <input type="file" accept="image/*" @change="handleImageSelect"
-                                    class="w-full text-xs text-eling-light/50 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white/10 file:text-eling-light hover:file:bg-white/20 cursor-pointer" />
+                                    class="w-full text-xs text-eling-light-subtext dark:text-eling-dark-text/50 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-gray-200 dark:file:bg-white/10 file:text-eling-light-text dark:file:text-eling-dark-text hover:file:bg-gray-300 dark:hover:file:bg-white/20 cursor-pointer" />
 
                                 <!-- Image Preview -->
                                 <div v-if="imagePreview" class="mt-2 relative">
-                                    <img :src="imagePreview" class="w-full h-32 object-contain bg-black/40 rounded" />
+                                    <img :src="imagePreview" class="w-full h-32 object-contain bg-gray-100 dark:bg-black/40 rounded border border-gray-200 dark:border-transparent" />
                                     <button @click="clearImage" type="button"
                                         class="absolute top-1 right-1 p-1 bg-red-500/80 rounded hover:bg-red-600">
                                         <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24"
