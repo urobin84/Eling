@@ -99,7 +99,7 @@ function getEventsForDay(day: number) {
 
                 <div v-if="viewMode === 'list'" class="relative w-full sm:w-64">
                     <input v-model="searchQuery" type="text" placeholder="Search events..."
-                        class="input-glass w-full pl-11 py-2.5 text-sm">
+                        class="input-search w-full pl-11 py-2.5 text-sm">
                     <svg class="w-4 h-4 text-gray-500 dark:text-gray-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

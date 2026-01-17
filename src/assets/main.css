@@ -113,6 +113,25 @@
     color: #767779;
   }
 
+  /* Search Bar - Lighter than background */
+  .input-search {
+    @apply input-glass;
+    background: #FFFFFF;
+    /* White in light mode */
+  }
+
+  html.dark .input-search {
+    background: #2C2D2E;
+    /* Lighter grey in dark mode */
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  html.dark .input-search:focus {
+    background: #131314;
+    /* Darker on focus for contrast if desired, or keep light */
+    border-color: #10B981;
+  }
+
   /* Date Input - Ensure calendar picker is visible in Tauri WebView */
   input[type="date"].input-glass {
     @apply rounded-xl;
