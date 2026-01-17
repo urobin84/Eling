@@ -1,0 +1,235 @@
+{
+    "info": {
+        "name": "ELING API - Client-Server",
+        "description": "REST API for ELING Psychotest Platform - Admin Server endpoints for receiving data from candidate clients",
+        "version": "1.0.0",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/health",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "health"
+                    ]
+                },
+                "description": "Check if API server is running and get version info"
+            },
+            "response": [
+                {
+                    "name": "Success",
+                    "originalRequest": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/health"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n  \"status\": \"ok\",\n  \"version\": \"0.1.0\",\n  \"timestamp\": \"2024-01-17T06:00:00Z\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "Get Event by Code",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/api/events/:code",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "events",
+                        ":code"
+                    ],
+                    "variable": [
+                        {
+                            "key": "code",
+                            "value": "ABC123",
+                            "description": "6-character event access code"
+                        }
+                    ]
+                },
+                "description": "Get event details by access code for candidate enrollment"
+            },
+            "response": [
+                {
+                    "name": "Success",
+                    "originalRequest": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/events/ABC123"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n  \"id\": 1,\n  \"event_name\": \"Psychotest Batch 2024\",\n  \"event_code\": \"ABC123\",\n  \"description\": \"Annual psychotest assessment\",\n  \"status\": \"active\"\n}"
+                },
+                {
+                    "name": "Not Found",
+                    "originalRequest": {
+                        "method": "GET",
+                        "url": "{{base_url}}/api/events/INVALID"
+                    },
+                    "status": "Not Found",
+                    "code": 404,
+                    "_postman_previewlanguage": "json",
+                    "body": "{\n  \"error\": \"Event not found\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "Submit Test Result",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"session_id\": \"session-12345-abc\",\n  \"event_id\": 1,\n  \"user_id\": 42,\n  \"answers\": [\n    {\n      \"question_id\": 1,\n      \"answer\": \"A\",\n      \"answered_at\": \"2024-01-17T06:00:00Z\"\n    },\n    {\n      \"question_id\": 2,\n      \"answer\": \"B\",\n      \"answered_at\": \"2024-01-17T06:00:15Z\"\n    },\n    {\n      \"question_id\": 3,\n      \"answer\": \"C\",\n      \"answered_at\": \"2024-01-17T06:00:30Z\"\n    }\n  ],\n  \"completed_at\": \"2024-01-17T06:05:00Z\"\n}"
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/test-results",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "test-results"
+                    ]
+                },
+                "description": "Submit test results from candidate client after test completion"
+            },
+            "response": [
+                {
+                    "name": "Success",
+                    "originalRequest": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/test-results",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"session_id\": \"session-12345-abc\",\n  \"event_id\": 1,\n  \"user_id\": 42,\n  \"answers\": [],\n  \"completed_at\": \"2024-01-17T06:05:00Z\"\n}"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Test result received successfully\",\n  \"result_id\": 123\n}"
+                },
+                {
+                    "name": "Bad Request",
+                    "originalRequest": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/test-results",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"session_id\": \"session-12345-abc\"\n}"
+                        }
+                    },
+                    "status": "Bad Request",
+                    "code": 400,
+                    "_postman_previewlanguage": "json",
+                    "body": "{\n  \"error\": \"Invalid payload\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "Upload Recording",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "session_id",
+                            "value": "session-12345-abc",
+                            "type": "text",
+                            "description": "Session identifier"
+                        },
+                        {
+                            "key": "recording_type",
+                            "value": "camera",
+                            "type": "text",
+                            "description": "Type: 'camera' or 'screen'"
+                        },
+                        {
+                            "key": "video",
+                            "type": "file",
+                            "src": "/path/to/recording.webm",
+                            "description": "Video file (WebM format)"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/recordings",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "recordings"
+                    ]
+                },
+                "description": "Upload video recording (camera or screen) from candidate client"
+            },
+            "response": [
+                {
+                    "name": "Success",
+                    "originalRequest": {
+                        "method": "POST",
+                        "url": "{{base_url}}/api/recordings"
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"Recording uploaded successfully: session-12345-abc.webm\",\n  \"result_id\": null\n}"
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8080",
+            "type": "string"
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { ElDatePicker } from 'element-plus';
+
 import BaseModal from '../molecules/BaseModal.vue';
 import BaseButton from '../atoms/BaseButton.vue';
 import BaseInput from '../atoms/BaseInput.vue';
@@ -38,14 +38,26 @@ const toolCategories: Record<string, string[]> = {
 
 const organizedTools = computed(() => {
     const result: { category: string; tools: Tool[] }[] = [];
+    const usedToolIds = new Set<number>();
+
+    // 1. Categorized Tools
     for (const [category, toolNames] of Object.entries(toolCategories)) {
-        const categoryTools = props.tools.filter(t =>
+        const categoryTools = props.tools.filter(t => 
             toolNames.some(name => t.name.toUpperCase().includes(name.toUpperCase()))
         );
+        
         if (categoryTools.length > 0) {
+            categoryTools.forEach(t => usedToolIds.add(t.id));
             result.push({ category, tools: categoryTools });
         }
     }
+
+    // 2. Uncategorized (Other) Tools
+    const otherTools = props.tools.filter(t => !usedToolIds.has(t.id));
+    if (otherTools.length > 0) {
+        result.push({ category: 'Other', tools: otherTools });
+    }
+
     return result;
 });
 
@@ -93,7 +105,7 @@ function handleCreate() {
     // Convert Date to string if needed
     const dateStr = typeof eventDate.value === 'string' 
         ? eventDate.value 
-        : eventDate.value.toISOString().split('T')[0];
+        : (eventDate.value as Date).toISOString().split('T')[0];
 
     emit('create', {
         name: eventName.value,
@@ -113,7 +125,7 @@ function handleClose() {
     emit('close');
     // Reset form
     eventName.value = '';
-    eventDate.value = '';
+    eventDate.value = new Date().toISOString().split('T')[0];
     eventDescription.value = '';
     selectedTools.value = [];
 }
@@ -131,15 +143,11 @@ function handleClose() {
                     />
                 </FormGroup>
                 <FormGroup label="Event Date" required>
-                    <el-date-picker
+                    <input
                         v-model="eventDate"
                         type="date"
-                        placeholder="Select event date"
-                        format="YYYY-MM-DD"
-                        value-format="YYYY-MM-DD"
-                        :disabled-date="(date: Date) => date < new Date(new Date().setHours(0,0,0,0))"
-                        class="w-full"
-                        size="large"
+                        class="input-glass w-full"
+                        :min="new Date().toISOString().split('T')[0]"
                     />
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         📅 When will this assessment take place?
