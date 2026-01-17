@@ -92,6 +92,8 @@ pub fn run() {
             commands::create_session,
             commands::auth::register_user,
             commands::auth::login_user,
+            commands::auth::update_avatar,
+            commands::auth::get_user_profile,
             commands::dashboard::get_all_users,
             commands::dashboard::get_events,
             commands::dashboard::create_event,

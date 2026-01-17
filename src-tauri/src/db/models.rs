@@ -58,6 +58,7 @@ pub struct User {
     pub role: String,
     pub password_hash: Option<String>,
     pub created_at: NaiveDateTime,
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]

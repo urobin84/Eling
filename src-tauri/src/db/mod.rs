@@ -188,6 +188,15 @@ impl Database {
         Ok(())
     }
 
+    pub async fn update_user_avatar(&self, username: &str, avatar_url: Option<String>) -> Result<(), Error> {
+        sqlx::query("UPDATE users SET avatar_url = ? WHERE username = ?")
+            .bind(avatar_url)
+            .bind(username)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
     pub async fn get_user_by_username(&self, username: &str) -> Result<User, Error> {
         sqlx::query_as::<_, User>("SELECT * FROM users WHERE username = ?")
             .bind(username)

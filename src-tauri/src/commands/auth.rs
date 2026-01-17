@@ -56,3 +56,26 @@ pub async fn login_user(
         Err("Invalid password".to_string())
     }
 }
+
+#[tauri::command]
+pub async fn update_avatar(
+    db: State<'_, Database>,
+    username: String,
+    avatar_url: String
+) -> Result<String, String> {
+    db.update_user_avatar(&username, Some(avatar_url))
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok("Avatar updated successfully".to_string())
+}
+
+#[tauri::command]
+pub async fn get_user_profile(
+    db: State<'_, Database>,
+    username: String
+) -> Result<User, String> {
+    let user = db.get_user_by_username(&username)
+        .await
+        .map_err(|e| e.to_string())?;
+    Ok(user)
+}

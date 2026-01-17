@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { useAuthStore } from '../../../stores/auth';
+
+const authStore = useAuthStore();
 
 interface UserProfile {
     id: number;
     username: string;
     email: string | null;
     role: string;
+    avatar_url?: string;
     created_at: string;
 }
 
@@ -15,6 +19,7 @@ const profile = ref<UserProfile>({
     username: 'admin',
     email: 'admin@eling.id',
     role: 'admin',
+    avatar_url: '',
     created_at: new Date().toISOString()
 });
 
@@ -23,6 +28,7 @@ const isSaving = ref(false);
 const editForm = ref({
     username: '',
     email: '',
+    avatar_url: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
@@ -30,9 +36,63 @@ const editForm = ref({
 
 const showPasswordSection = ref(false);
 
+async function handleAvatarUpload(event: Event) {
+    console.log('handleAvatarUpload triggered');
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    
+    if (file) {
+        console.log('File selected:', file.name, file.type, file.size);
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        // Validate file size (e.g. 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Image size should be less than 2MB');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            console.log('FileReader loaded');
+            const result = e.target?.result as string;
+            
+            // Upload to backend
+            try {
+                await invoke('update_avatar', { 
+                    username: profile.value.username,
+                    avatarUrl: result 
+                });
+                
+                profile.value.avatar_url = result;
+                editForm.value.avatar_url = result;
+                
+                // Update global store so header updates immediately
+                authStore.updateUser({ avatar_url: result });
+
+                // Reset input
+                target.value = '';
+                
+                alert('Profile picture updated successfully');
+            } catch (e) {
+                console.error(e);
+                alert('Failed to update image: ' + e);
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        console.log('No file selected');
+    }
+}
+
 function startEdit() {
     editForm.value.username = profile.value.username;
     editForm.value.email = profile.value.email || '';
+    editForm.value.avatar_url = profile.value.avatar_url || '';
+    editForm.value.avatar_url = profile.value.avatar_url || '';
     editForm.value.currentPassword = '';
     editForm.value.newPassword = '';
     editForm.value.confirmPassword = '';
@@ -42,7 +102,10 @@ function startEdit() {
 function cancelEdit() {
     isEditing.value = false;
     showPasswordSection.value = false;
+    showPasswordSection.value = false;
 }
+
+
 
 async function saveProfile() {
     // Validate
@@ -72,6 +135,7 @@ async function saveProfile() {
         // await invoke('update_user_profile', {
         //     username: editForm.value.username,
         //     email: editForm.value.email,
+        //     avatar_url: editForm.value.avatar_url,
         //     currentPassword: editForm.value.currentPassword,
         //     newPassword: editForm.value.newPassword
         // });
@@ -81,6 +145,7 @@ async function saveProfile() {
 
         profile.value.username = editForm.value.username;
         profile.value.email = editForm.value.email;
+        profile.value.avatar_url = editForm.value.avatar_url;
 
         alert('Profile updated successfully!');
         isEditing.value = false;
@@ -102,10 +167,24 @@ function formatDate(dateString: string) {
     });
 }
 
-onMounted(() => {
-    // TODO: Fetch actual user profile from backend
-    // const userProfile = await invoke<UserProfile>('get_current_user_profile');
-    // profile.value = userProfile;
+onMounted(async () => {
+    // Sync logic with auth store
+    if (!authStore.user) {
+        await authStore.fetchUser();
+    }
+    
+    if (authStore.user) {
+         // Clone to avoid direct mutation of store state from local form before save
+         profile.value = JSON.parse(JSON.stringify(authStore.user)); 
+         
+         // Ensure default values handling if needed
+         if (!profile.value.email) profile.value.email = '';
+         if (!profile.value.avatar_url) profile.value.avatar_url = '';
+
+         editForm.value.username = profile.value.username;
+         editForm.value.email = profile.value.email || '';
+         editForm.value.avatar_url = profile.value.avatar_url || '';
+    }
 });
 </script>
 
@@ -122,9 +201,23 @@ onMounted(() => {
         <div class="glass-panel p-8 border-black/5 dark:border-white/5">
             <!-- Avatar Section -->
             <div class="flex items-start gap-6 mb-8 pb-8 border-b border-black/10 dark:border-white/10">
-                <div
-                    class="w-24 h-24 rounded-full bg-gradient-to-br from-eling-emerald to-green-400 flex items-center justify-center text-eling-dark font-bold text-3xl shadow-lg">
-                    {{ profile.username.charAt(0).toUpperCase() }}
+                <div class="relative group">
+                    <div
+                        class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-eling-emerald to-green-400 flex items-center justify-center text-eling-dark font-bold text-3xl shadow-lg border-2 border-white dark:border-white/10 group-hover:border-eling-emerald transition-colors">
+                        <img v-if="profile.avatar_url" :src="profile.avatar_url" class="w-full h-full object-cover" />
+                        <span v-else>{{ profile.username.charAt(0).toUpperCase() }}</span>
+                        
+                        <!-- Upload Overlay -->
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <input type="file" accept="image/*" @change="handleAvatarUpload" 
+                        class="absolute inset-0 w-24 h-24 opacity-0 cursor-pointer rounded-full z-10" 
+                        title="Click to change avatar" />
                 </div>
                 <div class="flex-1">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-eling-dark-text">{{ profile.username }}</h3>
@@ -200,6 +293,8 @@ onMounted(() => {
 
             <!-- Edit Mode -->
             <div v-else class="space-y-6">
+
+
                 <!-- Basic Information -->
                 <div>
                     <h4 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text/80 mb-4 uppercase tracking-wider">
