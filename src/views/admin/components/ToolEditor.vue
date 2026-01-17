@@ -523,14 +523,14 @@ watch(() => props.toolId, fetchToolData, { immediate: true });
                     </div>
                     <div class="flex justify-end gap-2">
                         <button @click="showAddSubtest = false"
-                            class="px-3 py-1.5 text-xs text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 rounded">Cancel</button>
-                        <button @click="handleAddSubtest" class="btn-neumorphic px-4 py-1.5 text-xs">Save
+                            class="px-3 py-2.5 text-sm text-gray-900 dark:text-eling-dark-text/70 hover:bg-black/10 dark:bg-white/10 rounded">Cancel</button>
+                        <button @click="handleAddSubtest" class="btn-neumorphic px-4 py-2.5 text-sm">Save
                             Subtest</button>
                     </div>
                 </div>
 
                 <div v-if="!showAddSubtest" class="flex justify-end">
-                    <button @click="showAddSubtest = true" class="btn-neumorphic text-xs py-2 px-3 flex items-center">
+                    <button @click="showAddSubtest = true" class="btn-neumorphic text-sm py-2.5 px-3 flex items-center">
                         <svg class="w-3 h-3 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
