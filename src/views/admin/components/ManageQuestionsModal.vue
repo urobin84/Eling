@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import BaseSelect from '../../../components/atoms/BaseSelect.vue';
 
 interface Question {
     id: number;
@@ -30,6 +31,11 @@ const newQuestion = ref({
     correctAnswer: '',
     mediaUrl: '' // For image path
 });
+
+const questionTypeOptions = [
+    { label: 'Multiple Choice', value: 'multiple_choice' },
+    { label: 'True / False', value: 'true_false' }
+];
 
 const imagePreview = ref('');
 const editingQuestionId = ref<number | null>(null);
@@ -238,10 +244,10 @@ async function handleDeleteQuestion(id: number) {
 
                             <div>
                                 <label class="block text-xs text-eling-light-subtext dark:text-eling-dark-text/50 mb-1">Type</label>
-                                <select v-model="newQuestion.type" class="input-glass w-full text-sm">
-                                    <option value="multiple_choice">Multiple Choice</option>
-                                    <option value="true_false">True / False</option>
-                                </select>
+                                <BaseSelect
+                                    v-model="newQuestion.type"
+                                    :options="questionTypeOptions"
+                                />
                             </div>
 
                             <div>
@@ -301,7 +307,7 @@ async function handleDeleteQuestion(id: number) {
 
                             <div class="pt-4">
                                 <button @click="handleSaveQuestion" :disabled="isSubmitting"
-                                    class="btn-neumorphic w-full py-2 text-xs flex justify-center items-center">
+                                    class="btn-neumorphic w-full py-2.5 text-sm flex justify-center items-center">
                                     <span v-if="isSubmitting"
                                         class="animate-spin h-4 w-4 border-b-2 border-white rounded-full mr-2"></span>
                                     {{ isSubmitting ? 'Saving...' : (editingQuestionId ? 'Update Question' : 'Add Question') }}
