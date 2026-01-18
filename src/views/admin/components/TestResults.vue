@@ -3,6 +3,8 @@ import { ref, computed, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import SearchableDropdown from '@/components/molecules/SearchableDropdown.vue';
 import ExportSettingsModal from './ExportSettingsModal.vue';
+import BaseModal from '@/components/molecules/BaseModal.vue';
+import RecordingPlayback from './RecordingPlayback.vue';
 
 interface TestResult {
     id: number;
@@ -18,6 +20,8 @@ interface TestResult {
     interpretation?: string;
     status: 'pending' | 'completed' | 'reviewed';
     completed_at: string;
+    session_id: string;
+    recording_id?: string | null;
 }
 
 interface Tool {
@@ -28,7 +32,12 @@ interface Tool {
 // State
 const results = ref<TestResult[]>([]);
 const tools = ref<Tool[]>([]);
+
 const loading = ref(true);
+
+// Modals
+const showDeleteConfirm = ref(false);
+const isDeleting = ref(false);
 
 const statusOptions = [
     { value: 'all', label: 'All Status' },
@@ -55,7 +64,14 @@ const itemsPerPage = ref(10);
 const selectedResult = ref<TestResult | null>(null);
 const showDetailModal = ref(false);
 const showExportModal = ref(false);
+const showRecordingPlayback = ref(false);
 const isGeneratingReview = ref(false);
+const isEditingInterpretation = ref(false);
+const editBuffer = ref('');
+const isSavingInterpretation = ref(false);
+
+// Selection
+const selectedIds = ref<Set<number>>(new Set());
 
 // Computed
 const filteredResults = computed(() => {
@@ -162,10 +178,117 @@ async function generateAiReview() {
         }
 
     } catch (e) {
-        alert("Failed to generate AI review: " + e);
-        console.error(e);
+        const err = String(e); // Ensure it's a string
+        const errLower = err.toLowerCase();
+        console.error(err);
+        
+        if (errLower.includes('connection refused') || errLower.includes('failed to connect')) {
+            if (confirm("⚠️ Local AI (Ollama) is not running.\n\nWould you like to generate a MOCK interpretation to verify the UI flow?")) {
+                isGeneratingReview.value = true;
+                await new Promise(r => setTimeout(r, 1500));
+                
+                const score = selectedResult.value.raw_score || 0;
+                const mockReview = `[MOCK ANALYSIS] Based on the score of ${score}, the candidate shows potential. This is a simulated response because the local AI engine is unavailable. In a real environment, Gemma 2 2B would provide a psychometric analysis here.`;
+                
+                selectedResult.value.interpretation = mockReview;
+                
+                // Update in list as well
+                const idx = results.value.findIndex(r => r.id === selectedResult.value?.id);
+                if (idx !== -1) {
+                    results.value[idx].interpretation = mockReview;
+                }
+            }
+        } else {
+            alert("Failed to generate AI review: " + err);
+        }
     } finally {
         isGeneratingReview.value = false;
+    }
+}
+
+function startEditing() {
+    if (!selectedResult.value) return;
+    editBuffer.value = selectedResult.value.interpretation || '';
+    isEditingInterpretation.value = true;
+}
+
+function cancelEditing() {
+    isEditingInterpretation.value = false;
+    editBuffer.value = '';
+}
+
+async function saveInterpretation() {
+    if (!selectedResult.value) return;
+    
+    isSavingInterpretation.value = true;
+    try {
+        await invoke('update_test_interpretation', {
+            resultId: selectedResult.value.id,
+            interpretation: editBuffer.value
+        });
+        
+        // Update local state
+        selectedResult.value.interpretation = editBuffer.value;
+         // Update in list
+        const idx = results.value.findIndex(r => r.id === selectedResult.value?.id);
+        if (idx !== -1) {
+            results.value[idx].interpretation = editBuffer.value;
+        }
+        
+        isEditingInterpretation.value = false;
+    } catch (e) {
+        console.error('Failed to save interpretation:', e);
+        alert('Failed to save interpretation: ' + e);
+    } finally {
+        isSavingInterpretation.value = false;
+    }
+}
+
+function toggleSelectAll(e: Event) {
+    const checked = (e.target as HTMLInputElement).checked;
+    if (checked) {
+        paginatedResults.value.forEach(r => selectedIds.value.add(r.id));
+    } else {
+        selectedIds.value.clear();
+    }
+}
+
+function toggleSelection(id: number) {
+    if (selectedIds.value.has(id)) {
+        selectedIds.value.delete(id);
+    } else {
+        selectedIds.value.add(id);
+    }
+}
+
+// function toggleSelectAll... (keep existing)
+// function toggleSelection... (keep existing)
+
+function deleteSelected() {
+    if (selectedIds.value.size === 0) return;
+    showDeleteConfirm.value = true;
+}
+
+function deleteSingleResult(id: number) {
+    selectedIds.value.clear();
+    selectedIds.value.add(id);
+    showDeleteConfirm.value = true;
+}
+
+async function confirmDelete() {
+    isDeleting.value = true; // Use this to toggle loading state in modal
+    try {
+        await invoke('delete_test_results', { resultIds: Array.from(selectedIds.value) });
+        
+        // Success feedback (optional, maybe ElMessage if available, or just clear)
+        selectedIds.value.clear();
+        showDeleteConfirm.value = false;
+        await fetchData(); 
+    } catch (e) {
+        console.error('Failed to delete results:', e);
+        alert('Failed to delete results'); // Or specialized error modal
+    } finally {
+        isDeleting.value = false;
     }
 }
 
@@ -228,6 +351,18 @@ onMounted(fetchData);
                 class="min-w-[160px]"
             />
 
+            <!-- Bulk Actions -->
+            <button v-if="selectedIds.size > 0" 
+                @click="deleteSelected" 
+                :disabled="isDeleting"
+                class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-red-500/20 text-red-500 hover:text-red-600 font-bold whitespace-nowrap">
+                <svg v-if="isDeleting" class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-else class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete ({{ selectedIds.size }})
+            </button>
+
             <!-- Export Button -->
             <button @click="exportResults" class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-eling-emerald/20 font-bold whitespace-nowrap">
                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -244,6 +379,14 @@ onMounted(fetchData);
                 <table class="min-w-full divide-y divide-black/10 dark:divide-white/10">
                     <thead class="bg-black/5 dark:bg-white/5">
                         <tr>
+                            <th class="px-6 py-3 w-10">
+                                <input type="checkbox" 
+                                    :checked="selectedIds.size > 0 && selectedIds.size === paginatedResults.length"
+                                    :indeterminate="selectedIds.size > 0 && selectedIds.size < paginatedResults.length"
+                                    @change="toggleSelectAll"
+                                    class="rounded border-gray-300 text-eling-emerald focus:ring-eling-emerald cursor-pointer"
+                                >
+                            </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-900 dark:text-white/50 uppercase tracking-wider">
                                 Candidate
@@ -292,7 +435,15 @@ onMounted(fetchData);
                             </td>
                         </tr>
                         <tr v-for="result in paginatedResults" :key="result.id"
-                            class="hover:bg-black/5 dark:bg-white/5 transition-colors">
+                            class="hover:bg-black/5 dark:bg-white/5 transition-colors"
+                            :class="{'bg-blue-50/50 dark:bg-blue-900/10': selectedIds.has(result.id)}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" 
+                                    :checked="selectedIds.has(result.id)" 
+                                    @change="toggleSelection(result.id)"
+                                    class="rounded border-gray-300 text-eling-emerald focus:ring-eling-emerald cursor-pointer"
+                                >
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div
@@ -340,10 +491,23 @@ onMounted(fetchData);
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <button @click="viewDetail(result)"
-                                    class="text-xs text-cyan-400 hover:text-cyan-300 font-medium px-3 py-1 rounded hover:bg-black/5 dark:bg-white/5 transition-colors">
-                                    View Detail
-                                </button>
+                                <div class="flex items-center justify-center gap-2">
+                                    <button @click="viewDetail(result)"
+                                        title="View Detail"
+                                        class="p-2 rounded-lg text-cyan-400 hover:bg-cyan-500/10 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                    <button @click="deleteSingleResult(result.id)"
+                                        title="Delete Result"
+                                        class="p-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -440,16 +604,44 @@ onMounted(fetchData);
                     <div class="bg-black/5 dark:bg-white/5 rounded-xl p-4 mb-6 relative group">
                         <div class="flex justify-between items-center mb-2">
                             <div class="text-xs text-gray-900 dark:text-white/50 uppercase">Interpretation</div>
-                            <button v-if="selectedResult.interpretation" @click="generateAiReview" 
-                                :disabled="isGeneratingReview"
-                                class="text-[10px] text-eling-emerald hover:text-white transition-colors opacity-0 group-hover:opacity-100 flex items-center">
-                                <span v-if="isGeneratingReview" class="animate-spin mr-1">⟳</span>
-                                {{ isGeneratingReview ? 'Regenerating...' : 'Regenerate with AI' }}
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button v-if="selectedResult.interpretation && !isEditingInterpretation" @click="startEditing"
+                                    class="text-[10px] text-blue-400 hover:text-blue-300 transition-colors opacity-0 group-hover:opacity-100 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                    Edit
+                                </button>
+                                <button v-if="selectedResult.interpretation && !isEditingInterpretation" @click="generateAiReview" 
+                                    :disabled="isGeneratingReview"
+                                    class="text-[10px] text-eling-emerald hover:text-white transition-colors opacity-0 group-hover:opacity-100 flex items-center">
+                                    <span v-if="isGeneratingReview" class="animate-spin mr-1">⟳</span>
+                                    {{ isGeneratingReview ? 'Regenerating...' : 'Regenerate' }}
+                                </button>
+                            </div>
                         </div>
                         
-                        <div v-if="selectedResult.interpretation" class="text-gray-900 dark:text-white text-sm leading-relaxed whitespace-pre-line">
-                            {{ selectedResult.interpretation }}
+                        <div v-if="selectedResult.interpretation">
+                            <div v-if="!isEditingInterpretation" class="max-h-60 overflow-y-auto pr-2 custom-scrollbar" @dblclick="startEditing">
+                                <div class="text-gray-900 dark:text-white text-sm leading-relaxed whitespace-pre-line">
+                                    {{ selectedResult.interpretation }}
+                                </div>
+                            </div>
+                            <div v-else class="flex flex-col gap-2">
+                                <textarea 
+                                    v-model="editBuffer"
+                                    class="w-full h-60 bg-black/10 dark:bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-eling-emerald focus:border-transparent resize-none leading-relaxed custom-scrollbar"
+                                    placeholder="Enter interpretation..."
+                                ></textarea>
+                                <div class="flex justify-end gap-2 text-xs">
+                                    <button @click="cancelEditing" class="px-3 py-1.5 rounded hover:bg-white/10 text-gray-500 hover:text-gray-300 transition">Cancel</button>
+                                    <button @click="saveInterpretation" :disabled="isSavingInterpretation" 
+                                        class="px-3 py-1.5 rounded bg-eling-emerald text-white hover:bg-eling-emerald/90 transition flex items-center">
+                                        <span v-if="isSavingInterpretation" class="animate-spin mr-1 text-[8px]">⟳</span>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div v-else class="flex flex-col items-center justify-center py-6">
                             <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">No interpretation available yet.</p>
@@ -475,18 +667,37 @@ onMounted(fetchData);
                         </span>
                     </div>
 
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button @click="showDetailModal = false"
-                            class="px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-900 dark:text-white hover:bg-black/5 dark:bg-white/5 transition-colors text-sm">
-                            Close
-                        </button>
-                        <button class="btn-neumorphic text-sm py-2 px-4">
-                            Mark as Reviewed
-                        </button>
+                    <div class="mt-6 flex justify-between items-center gap-3">
+                        <div class="flex gap-2">
+                             <button v-if="selectedResult.session_id" 
+                                @click="showRecordingPlayback = true"
+                                class="btn-neumorphic text-sm py-2 px-4 shadow-blue-500/20 text-blue-500 font-bold flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                View Recording
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button @click="showDetailModal = false"
+                                class="px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-900 dark:text-white hover:bg-black/5 dark:bg-white/5 transition-colors text-sm">
+                                Close
+                            </button>
+                            <button class="btn-neumorphic text-sm py-2 px-4">
+                                Mark as Reviewed
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Recording Playback Modal -->
+        <RecordingPlayback 
+            v-if="showRecordingPlayback && selectedResult" 
+            :session-id="selectedResult.recording_id || selectedResult.session_id" 
+            @close="showRecordingPlayback = false" 
+        />
 
         <!-- Export Settings Modal -->
         <ExportSettingsModal 
@@ -494,5 +705,48 @@ onMounted(fetchData);
             :results="results"
             @close="showExportModal = false" 
         />
+        
+        <!-- Delete Confirmation Modal -->
+        <BaseModal :show="showDeleteConfirm" title="Delete Results" size="md" @close="!isDeleting ? showDeleteConfirm = false : null">
+            <div class="text-center p-4">
+                <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </div>
+                
+                <h4 v-if="!isDeleting" class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                    Are you sure?
+                </h4>
+                <h4 v-else class="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                    Deleting...
+                </h4>
+
+                <p v-if="!isDeleting" class="text-gray-600 dark:text-gray-300 mb-6">
+                    You are about to permanently delete <span class="font-bold text-red-500">{{ selectedIds.size }}</span> test results. This action cannot be undone.
+                </p>
+                <div v-else class="flex justify-center mb-6">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+                </div>
+
+                <div class="flex gap-3 justify-center">
+                    <button 
+                        v-if="!isDeleting"
+                        @click="showDeleteConfirm = false"
+                        class="px-4 py-2 rounded-lg border border-black/10 dark:border-white/10 hover:bg-black/5 dark:bg-white/5 transition-colors font-medium text-gray-700 dark:text-gray-200"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        @click="confirmDelete" 
+                        :disabled="isDeleting"
+                        class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors font-bold flex items-center shadow-lg shadow-red-500/30"
+                    >
+                        <span v-if="isDeleting">Deleting...</span>
+                        <span v-else>Yes, Delete</span>
+                    </button>
+                </div>
+            </div>
+        </BaseModal>
     </div>
 </template>

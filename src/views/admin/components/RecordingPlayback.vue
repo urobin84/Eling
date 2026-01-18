@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
-import { convertFileSrc } from '@tauri-apps/api/core';
 import BaseCard from '@/components/atoms/BaseCard.vue';
 import BaseButton from '@/components/atoms/BaseButton.vue';
 
@@ -29,9 +28,10 @@ const emit = defineEmits<{
 }>();
 
 const metadata = ref<RecordingMetadata | null>(null);
-const cameraVideoUrl = ref<string>('');
-const screenVideoUrl = ref<string>('');
+const cameraVideoUrl = ref<string | null>(null);
+const screenVideoUrl = ref<string | null>(null);
 const loading = ref(true);
+const isLoadingVideo = ref(false);
 const error = ref<string>('');
 const viewMode = ref<'split' | 'camera' | 'screen'>('split');
 
@@ -46,27 +46,41 @@ async function loadRecording() {
             sessionId: props.sessionId
         });
 
-        // Get video paths
+        // Load video data as Blobs for maximum compatibility/security
+        isLoadingVideo.value = true;
+        
         if (metadata.value.camera_file) {
-            const cameraPath = await invoke<string>('get_recording_video_path', {
-                sessionId: props.sessionId,
-                videoType: 'camera'
-            });
-            cameraVideoUrl.value = convertFileSrc(cameraPath);
+            try {
+                const cameraData = await invoke<number[]>('get_recording_data', {
+                    sessionId: props.sessionId,
+                    videoType: 'camera'
+                });
+                const blob = new Blob([new Uint8Array(cameraData)], { type: 'video/webm' });
+                cameraVideoUrl.value = URL.createObjectURL(blob);
+            } catch (e: any) {
+                console.error('Failed to load camera video:', e);
+            }
         }
 
         if (metadata.value.screen_file) {
-            const screenPath = await invoke<string>('get_recording_video_path', {
-                sessionId: props.sessionId,
-                videoType: 'screen'
-            });
-            screenVideoUrl.value = convertFileSrc(screenPath);
+            try {
+                const screenData = await invoke<number[]>('get_recording_data', {
+                    sessionId: props.sessionId,
+                    videoType: 'screen'
+                });
+                const blob = new Blob([new Uint8Array(screenData)], { type: 'video/webm' });
+                screenVideoUrl.value = URL.createObjectURL(blob);
+            } catch (e: any) {
+                console.error('Failed to load screen video:', e);
+            }
         }
 
         loading.value = false;
     } catch (e: any) {
         error.value = e.toString();
         loading.value = false;
+    } finally {
+        isLoadingVideo.value = false;
     }
 }
 
@@ -107,6 +121,11 @@ function formatDate(timestamp: number): string {
 }
 
 onMounted(loadRecording);
+
+onUnmounted(() => {
+    if (cameraVideoUrl.value) URL.revokeObjectURL(cameraVideoUrl.value);
+    if (screenVideoUrl.value) URL.revokeObjectURL(screenVideoUrl.value);
+});
 </script>
 
 <template>
@@ -188,10 +207,15 @@ onMounted(loadRecording);
                         <div class="flex-1 flex items-center justify-center">
                             <video 
                                 v-if="cameraVideoUrl"
-                                :src="cameraVideoUrl"
                                 controls
+                                preload="metadata"
+                                playsinline
+                                crossorigin="anonymous"
                                 class="w-full h-full object-contain"
-                            />
+                            >
+                                <source :src="cameraVideoUrl" type="video/webm">
+                                Your browser does not support the video tag.
+                            </video>
                             <div v-else class="text-white/50">No camera recording</div>
                         </div>
                     </div>
@@ -204,10 +228,15 @@ onMounted(loadRecording);
                         <div class="flex-1 flex items-center justify-center">
                             <video 
                                 v-if="screenVideoUrl"
-                                :src="screenVideoUrl"
                                 controls
+                                preload="metadata"
+                                playsinline
+                                crossorigin="anonymous"
                                 class="w-full h-full object-contain"
-                            />
+                            >
+                                <source :src="screenVideoUrl" type="video/webm">
+                                Your browser does not support the video tag.
+                            </video>
                             <div v-else class="text-white/50">No screen recording</div>
                         </div>
                     </div>

@@ -1,0 +1,14 @@
+{
+  "session_id": "session-1768698597668-a335jg1hm",
+  "user_id": 6,
+  "username": "eve",
+  "test_name": "TIU",
+  "event_name": null,
+  "started_at": 1768698601,
+  "ended_at": 1768698640,
+  "duration": 39,
+  "camera_file": "camera.webm",
+  "screen_file": "screen.webm",
+  "camera_size": 4222868,
+  "screen_size": 2053821
+}

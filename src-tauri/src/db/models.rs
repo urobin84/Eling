@@ -48,6 +48,8 @@ pub struct Event {
     pub max_participants: Option<i64>,
     pub enrollment_deadline: Option<String>,
     pub created_at: NaiveDateTime,
+    #[sqlx(default)]
+    pub participant_count: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -119,6 +121,8 @@ pub struct TestResultDTO {
     pub interpretation: Option<String>,
     pub status: String,   // from session status or logic
     pub completed_at: Option<NaiveDateTime>,
+    pub session_id: String,
+    pub recording_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -190,4 +194,16 @@ pub struct ParticipantInfo {
     pub status: String,
     pub enrolled_at: String,
     pub completed_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct CandidateEvent {
+    pub id: i64,
+    pub event_name: String,
+    pub description: Option<String>,
+    pub status: String, // Event status
+    pub event_code: Option<String>,
+    pub enrollment_deadline: Option<String>,
+    pub created_at: NaiveDateTime,
+    pub participant_status: String, // User's status (enrolled, completed, etc)
 }

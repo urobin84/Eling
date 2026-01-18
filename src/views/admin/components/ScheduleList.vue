@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 // Types
 interface Event {
@@ -14,15 +14,28 @@ interface Event {
 
 const props = defineProps<{
     events: Event[];
+    loading?: boolean;
 }>();
 
-const emit = defineEmits(['create', 'viewDetails']);
+const emit = defineEmits(['create', 'viewDetails', 'delete']);
 
 // State
 const viewMode = ref<'list' | 'calendar'>('list');
 const searchQuery = ref('');
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
+const selectedEvents = ref<Set<number>>(new Set());
+
+// Watch for event updates to clean up selection
+watch(() => props.events, (newEvents) => {
+    const currentIds = new Set(newEvents.map(e => e.id));
+    // Remove IDs that no longer exist in the data
+    for (const id of selectedEvents.value) {
+        if (!currentIds.has(id)) {
+            selectedEvents.value.delete(id);
+        }
+    }
+}, { deep: true });
 
 // --- LIST VIEW LOGIC ---
 const filteredEvents = computed(() => {
@@ -41,6 +54,31 @@ const paginatedEvents = computed(() => {
 });
 
 const totalPages = computed(() => Math.ceil(filteredEvents.value.length / itemsPerPage.value));
+
+// Selection Logic
+const allSelected = computed(() => {
+    return paginatedEvents.value.length > 0 && paginatedEvents.value.every(e => selectedEvents.value.has(e.id));
+});
+
+function toggleSelection(id: number) {
+    if (selectedEvents.value.has(id)) {
+        selectedEvents.value.delete(id);
+    } else {
+        selectedEvents.value.add(id);
+    }
+}
+
+function toggleAll() {
+    if (allSelected.value) {
+        paginatedEvents.value.forEach(e => selectedEvents.value.delete(e.id));
+    } else {
+        paginatedEvents.value.forEach(e => selectedEvents.value.add(e.id));
+    }
+}
+
+function deleteSelected() {
+    emit('delete', Array.from(selectedEvents.value));
+}
 
 // --- CALENDAR VIEW LOGIC ---
 const currentDate = ref(new Date());
@@ -110,6 +148,18 @@ function getEventsForDay(day: number) {
 
             <!-- Actions -->
             <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <button v-if="selectedEvents.size > 0" @click="deleteSelected" :disabled="loading"
+                    class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-red-500/20 font-bold whitespace-nowrap text-red-500 border-red-500/30 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg v-if="!loading" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <svg v-else class="animate-spin -ml-1 mr-2 h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span v-if="!loading">Delete ({{ selectedEvents.size }})</span>
+                    <span v-else>Deleting...</span>
+                </button>
                 <button @click="$emit('create')"
                     class="btn-neumorphic text-sm py-2.5 px-5 flex items-center shadow-eling-emerald/20 font-bold whitespace-nowrap">
                     <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,6 +177,10 @@ function getEventsForDay(day: number) {
                 <table class="min-w-full divide-y divide-white/10">
                     <thead class="bg-black/5 dark:bg-white/5">
                         <tr>
+                            <th class="px-6 py-3 text-left">
+                                <input type="checkbox" :checked="allSelected" @change="toggleAll" 
+                                    class="rounded bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-eling-emerald focus:ring-eling-emerald">
+                            </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-mono font-medium text-gray-500 dark:text-gray-900 dark:text-eling-dark-text/50 uppercase tracking-wider">
                                 Event Name</th>
@@ -153,6 +207,10 @@ function getEventsForDay(day: number) {
                         </tr>
                         <tr v-for="event in paginatedEvents" :key="event.id"
                             class="hover:bg-black/5 dark:bg-white/5 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" :checked="selectedEvents.has(event.id)" @change="toggleSelection(event.id)"
+                                    class="rounded bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-eling-emerald focus:ring-eling-emerald">
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-bold text-gray-900 dark:text-eling-dark-text">{{ event.event_name
                                 }}</div>

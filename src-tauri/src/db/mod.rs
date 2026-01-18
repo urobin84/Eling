@@ -210,26 +210,132 @@ impl Database {
             .await
     }
 
-    pub async fn create_event(&self, name: &str, description: Option<String>) -> Result<i64, Error> {
+    pub async fn create_event(&self, name: &str, description: Option<String>, event_date: Option<String>) -> Result<i64, Error> {
         let id = sqlx::query(
             r#"
-            INSERT INTO events (event_name, description, status, created_at)
-            VALUES (?, ?, 'draft', ?)
+            INSERT INTO events (event_name, description, status, created_at, enrollment_deadline)
+            VALUES (?, ?, 'draft', ?, ?)
             "#
         )
         .bind(name)
         .bind(description)
         .bind(chrono::Local::now().naive_local())
+        .bind(event_date)
         .execute(&self.pool)
         .await?
         .last_insert_rowid();
         Ok(id)
     }
 
+    pub async fn delete_event(&self, event_id: i64) -> Result<(), Error> {
+        // Due to ON DELETE CASCADE, this will automatically remove related:
+        // - event_packages
+        // - event_participants
+        // - sessions
+        sqlx::query("DELETE FROM events WHERE id = ?")
+            .bind(event_id)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
+    }
+
+    pub async fn add_tools_to_event(&self, event_id: i64, tool_ids: Vec<i64>) -> Result<(), Error> {
+        println!("DEBUG: add_tools_to_event START. Event: {}, Tools: {:?}", event_id, tool_ids);
+        for (index, tool_id) in tool_ids.iter().enumerate() {
+            // First check if the tool exists
+            let tool_exists = sqlx::query("SELECT id FROM tools WHERE id = ?")
+                .bind(tool_id)
+                .fetch_optional(&self.pool)
+                .await?
+                .is_some();
+            
+            if !tool_exists {
+                println!("DEBUG: Tool {} does not exist, skipping", tool_id);
+                continue; // Skip non-existent tools
+            }
+
+            println!("DEBUG: Tool {} exists. Checking package...", tool_id);
+
+            // Check if package already exists for this tool
+            let existing_package = sqlx::query("SELECT id FROM packages WHERE tool_id = ? AND version = '1.0'")
+                .bind(tool_id)
+                .fetch_optional(&self.pool)
+                .await?;
+
+            let package_id = if let Some(row) = existing_package {
+                let id: i64 = sqlx::Row::get(&row, "id");
+                println!("DEBUG: Using existing package {} for tool {}", id, tool_id);
+                id
+            } else {
+                println!("DEBUG: Creating NEW package for tool {}", tool_id);
+                // Create new package
+                let id = sqlx::query(
+                    r#"
+                    INSERT INTO packages (tool_id, package_name, version, content_data)
+                    VALUES (?, ?, '1.0', '{}')
+                    "#
+                )
+                .bind(tool_id)
+                .bind(format!("Package for tool {}", tool_id))
+                .execute(&self.pool)
+                .await?
+                .last_insert_rowid();
+                println!("DEBUG: Created new package {} for tool {}", id, tool_id);
+                id
+            };
+
+            // Link package to event
+            println!("DEBUG: Linking package {} to event {}", package_id, event_id);
+            // Use INSERT OR IGNORE to prevent duplicate linking errors if retried
+            sqlx::query(
+                r#"
+                INSERT OR IGNORE INTO event_packages (event_id, package_id, sequence_order)
+                VALUES (?, ?, ?)
+                "#
+            )
+            .bind(event_id)
+            .bind(package_id)
+            .bind(index as i64)
+            .execute(&self.pool)
+            .await?;
+            println!("DEBUG: Linked package {} to event {}", package_id, event_id);
+        }
+        println!("DEBUG: add_tools_to_event DONE");
+        Ok(())
+    }
+
+    pub async fn get_event_packages(&self, event_id: i64) -> Result<Vec<(i64, String, String)>, Error> {
+        println!("DEBUG: Fetching packages for event {}", event_id);
+        let packages = sqlx::query_as::<_, (i64, String, String)>(
+            r#"
+            SELECT DISTINCT t.id, t.name, t.category
+            FROM tools t
+            JOIN packages p ON p.tool_id = t.id
+            JOIN event_packages ep ON ep.package_id = p.id
+            WHERE ep.event_id = ?
+            ORDER BY t.id
+            "#
+        )
+        .bind(event_id)
+        .fetch_all(&self.pool)
+        .await?;
+
+        println!("DEBUG: Found {} packages for event {}", packages.len(), event_id);
+        Ok(packages)
+    }
+
     pub async fn get_all_events(&self) -> Result<Vec<Event>, Error> {
-        sqlx::query_as::<_, Event>("SELECT * FROM events ORDER BY created_at DESC")
-            .fetch_all(&self.pool)
-            .await
+        sqlx::query_as::<_, Event>(
+            r#"
+            SELECT e.*, COUNT(ep.id) as participant_count
+            FROM events e
+            LEFT JOIN event_participants ep ON ep.event_id = e.id
+            GROUP BY e.id
+            ORDER BY e.created_at DESC
+            "#
+        )
+        .fetch_all(&self.pool)
+        .await
     }
 
     pub async fn get_sessions_by_user(&self, user_id: i64) -> Result<Vec<Session>, Error> {
@@ -249,12 +355,17 @@ impl Database {
                 e.id as event_id,
                 e.event_name as event_name,
                 0 as tool_id,
-                'Assessment' as tool_name,
-                0 as score,
-                0 as raw_score,
-                NULL as percentile,
-                json_extract(r.interpretations, '$.ai_review') as interpretation,
+                COALESCE(json_extract(s.metadata, '$.testName'), 'Assessment') as tool_name,
+                CAST(COALESCE(json_extract(r.scores, '$.total_score'), 0) AS INTEGER) as score,
+                CAST(COALESCE(json_extract(r.scores, '$.raw_score'), 0) AS INTEGER) as raw_score,
+                CAST(json_extract(r.scores, '$.percentile') AS INTEGER) as percentile,
+                COALESCE(
+                    json_extract(r.interpretations, '$.ai_review'),
+                    json_extract(r.interpretations, '$.response')
+                ) as interpretation,
                 s.status as status,
+                CAST(s.id AS TEXT) as session_id,
+                json_extract(s.metadata, '$.recordingId') as recording_id,
                 r.generated_at as completed_at
             FROM reports r
             JOIN sessions s ON r.session_id = s.id
@@ -265,6 +376,40 @@ impl Database {
 
         sqlx::query_as::<_, TestResultDTO>(sql)
             .fetch_all(&self.pool)
+            .await
+    }
+
+    pub async fn get_test_result_by_id(&self, report_id: i64) -> Result<TestResultDTO, Error> {
+        let sql = r#"
+            SELECT 
+                r.id as id,
+                CAST(COALESCE(s.user_id, 0) AS INTEGER) as candidate_id,
+                COALESCE(u.username, s.participant_id) as candidate_name,
+                e.id as event_id,
+                e.event_name as event_name,
+                0 as tool_id,
+                COALESCE(json_extract(s.metadata, '$.testName'), 'Assessment') as tool_name,
+                CAST(COALESCE(json_extract(r.scores, '$.total_score'), 0) AS INTEGER) as score,
+                CAST(COALESCE(json_extract(r.scores, '$.raw_score'), 0) AS INTEGER) as raw_score,
+                CAST(json_extract(r.scores, '$.percentile') AS INTEGER) as percentile,
+                COALESCE(
+                    json_extract(r.interpretations, '$.ai_review'),
+                    json_extract(r.interpretations, '$.response')
+                ) as interpretation,
+                s.status as status,
+                CAST(s.id AS TEXT) as session_id,
+                json_extract(s.metadata, '$.recordingId') as recording_id,
+                r.generated_at as completed_at
+            FROM reports r
+            JOIN sessions s ON r.session_id = s.id
+            JOIN events e ON s.event_id = e.id
+            LEFT JOIN users u ON s.user_id = u.id
+            WHERE r.id = ?
+        "#;
+
+        sqlx::query_as::<_, TestResultDTO>(sql)
+            .bind(report_id)
+            .fetch_one(&self.pool)
             .await
     }
 
@@ -522,10 +667,19 @@ impl Database {
     }
     
     /// Get user's events
-    pub async fn get_user_events(&self, user_id: i64) -> Result<Vec<Event>, Error> {
-        sqlx::query_as::<_, Event>(
+    pub async fn get_user_events(&self, user_id: i64) -> Result<Vec<CandidateEvent>, Error> {
+        sqlx::query_as::<_, CandidateEvent>(
             r#"
-            SELECT e.* FROM events e
+            SELECT 
+                e.id,
+                e.event_name,
+                e.description,
+                e.status,
+                e.event_code,
+                e.enrollment_deadline,
+                e.created_at,
+                ep.status as participant_status
+            FROM events e
             JOIN event_participants ep ON e.id = ep.event_id
             WHERE ep.user_id = ?
             ORDER BY e.created_at DESC
@@ -615,5 +769,74 @@ impl Database {
             .bind(report_id)
             .fetch_one(&self.pool)
             .await
+    }
+
+    pub async fn create_report(&self, session_id: i64, scores: serde_json::Value, interpretations: serde_json::Value) -> Result<i64, Error> {
+        let id = sqlx::query(
+            r#"
+            INSERT INTO reports (session_id, scores, interpretations, generated_at)
+            VALUES (?, ?, ?, ?)
+            "#
+        )
+        .bind(session_id)
+        .bind(scores)
+        .bind(interpretations)
+        .bind(chrono::Local::now().naive_local())
+        .execute(&self.pool)
+        .await?
+            .last_insert_rowid();
+        Ok(id)
+    }
+
+    pub async fn delete_test_results(&self, report_ids: Vec<i64>) -> Result<(), Error> {
+        // Bulk delete
+        // Provide a placeholder string based on length
+        if report_ids.is_empty() {
+            return Ok(());
+        }
+
+        let placeholders: Vec<String> = report_ids.iter().map(|_| "?".to_string()).collect();
+        let sql = format!("DELETE FROM reports WHERE id IN ({})", placeholders.join(","));
+
+        let mut query = sqlx::query(&sql);
+        for id in report_ids {
+            query = query.bind(id);
+        }
+
+        query.execute(&self.pool).await?;
+        Ok(())
+    }
+
+    pub async fn reset_participant_session(&self, event_id: i64, user_id: i64) -> Result<(), Error> {
+        // 1. Find the session ID for this user/event combo
+        let session_query = sqlx::query(
+            "SELECT id FROM sessions WHERE event_id = ? AND user_id = ?" // Assuming user_id is linked
+        )
+        .bind(event_id)
+        .bind(user_id)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        // 2. Delete session (Cascade should handle reports, recordings etc if configured, else manual)
+        // Check cascade support in SQLite schema. If not standard, we might need manual delete.
+        // Assuming cascade for now based on previous 'delete_event' comment.
+        if let Some(row) = session_query {
+             let session_id: i64 = row.get("id");
+             sqlx::query("DELETE FROM sessions WHERE id = ?")
+                .bind(session_id)
+                .execute(&self.pool)
+                .await?;
+        }
+
+        // 3. Reset participant status to 'enrolled', clear completed_at
+        sqlx::query(
+            "UPDATE event_participants SET status = 'enrolled', completed_at = NULL WHERE event_id = ? AND user_id = ?"
+        )
+        .bind(event_id)
+        .bind(user_id)
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
     }
 }

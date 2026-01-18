@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseCard from '@/components/atoms/BaseCard.vue';
 import BaseButton from '@/components/atoms/BaseButton.vue';
-import EventMetadata from '@/components/molecules/EventMetadata.vue';
+import BaseBadge from '@/components/atoms/BaseBadge.vue';
 
 interface Event {
   id: number;
@@ -9,6 +9,7 @@ interface Event {
   description?: string;
   status: string;
   created_at: string;
+  participant_status?: string;
 }
 
 defineProps<{
@@ -22,7 +23,29 @@ defineEmits<{
 
 <template>
   <BaseCard padding="md" class="hover:shadow-xl dark:hover:shadow-eling-emerald/10 transition-all group active:scale-[0.98]">
-    <EventMetadata :status="event.status" :date="event.created_at" class="mb-4" />
+    <!-- Header Row: Date & Badges -->
+    <div class="flex justify-between items-start mb-4">
+      <!-- Date -->
+      <span class="text-xs text-gray-500 dark:text-gray-400 font-mono pt-1">
+        {{ new Date(event.created_at).toLocaleDateString() }}
+      </span>
+
+      <!-- Badges -->
+      <div class="flex gap-2">
+        <BaseBadge
+          :variant="event.status === 'published' ? 'success' : 'warning'"
+        >
+          {{ event.status }}
+        </BaseBadge>
+        <BaseBadge
+          v-if="event.participant_status"
+          :variant="event.participant_status === 'completed' ? 'success' : 
+                   event.participant_status === 'in-progress' ? 'warning' : 'info'"
+        >
+          {{ event.participant_status }}
+        </BaseBadge>
+      </div>
+    </div>
 
     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-eling-emerald transition-colors">
       {{ event.event_name }}

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted, watch } from 'vue';
-import { useTestStore } from '../stores/test';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { invoke } from '@tauri-apps/api/core';
 import { useRecording } from '../composables/useRecording';
 
-const store = useTestStore();
+const route = useRoute();
+const router = useRouter();
 const { isRecording, startRecording, stopRecording } = useRecording();
 
 // Test flow states
@@ -23,52 +25,140 @@ const timerWarning = ref(false);
 const answers = ref<Record<number, string>>({});
 const answeredQuestions = ref<Set<number>>(new Set());
 
-// Mock test data (will be replaced with real data from store)
-const testData = ref({
-  tool: {
-    id: 1,
-    name: 'IST',
-    description: 'Intelligence Structure Test - Tes inteligensi komprehensif untuk mengukur berbagai aspek kecerdasan',
-    category: 'kognitif'
-  },
-  subtests: [
-    {
-      id: 1,
-      name: 'SE (Satzergänzung)',
-      description: 'Melengkapi kalimat dengan kata yang tepat. Tes ini mengukur kemampuan penalaran verbal dan pemahaman bahasa.',
-      instructions: [
-        'Bacalah setiap kalimat dengan teliti',
-        'Pilih kata yang paling tepat untuk melengkapi kalimat',
-        'Jangan terlalu lama pada satu soal',
-        'Waktu pengerjaan: 6 menit'
-      ],
-      time_limit: 360,
-      questions: [
-        { id: 1, text: 'Air selalu mengalir ke tempat yang lebih ...', options: ['tinggi', 'rendah', 'jauh', 'dekat'] },
-        { id: 2, text: 'Matahari terbit dari arah ... dan tenggelam di arah ...', options: ['barat-timur', 'timur-barat', 'utara-selatan', 'selatan-utara'] }
-      ]
-    },
-    {
-      id: 2,
-      name: 'WA (Wortauswahl)',
-      description: 'Memilih kata yang tidak sejenis. Tes ini mengukur kemampuan klasifikasi dan penalaran logis.',
-      instructions: [
-        'Perhatikan kelompok kata yang diberikan',
-        'Temukan kata yang TIDAK sejenis dengan lainnya',
-        'Fokus pada kesamaan konsep atau kategori',
-        'Waktu pengerjaan: 6 menit'
-      ],
-      time_limit: 360,
-      questions: [
-        { id: 3, text: 'Kata mana yang tidak sejenis?', options: ['apel', 'jeruk', 'wortel', 'mangga'] },
-        { id: 4, text: 'Kata mana yang tidak sejenis?', options: ['kursi', 'meja', 'lemari', 'buku'] }
-      ]
+// Event ID from route
+const eventId = ref<number | null>(null);
+const isLoadingTest = ref(true);
+
+// Test data structure (will be loaded from backend)
+interface TestTool {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+}
+
+interface TestData {
+  tool: TestTool;
+  subtests: any[];
+}
+
+const testData = ref<TestData | null>(null);
+
+// Load test data from event packages
+// Load test data from event packages
+async function loadEventPackages() {
+  try {
+    isLoadingTest.value = true;
+    console.log('TestRunner: Fetching packages for Event ID:', eventId.value);
+    
+    if (!eventId.value || isNaN(eventId.value)) {
+        console.error('TestRunner: Invalid Event ID:', eventId.value);
+        alert('Invalid Event ID');
+        router.push('/dashboard');
+        return;
     }
-  ]
-});
+
+    const packages = await invoke<Array<[number, string, string]>>('get_event_packages', {
+      eventId: eventId.value
+    });
+
+    console.log('Loaded packages:', packages);
+
+    if (!packages || packages.length === 0) {
+      console.error('No packages found for event');
+      alert('No assessment tools found for this event');
+      router.push('/dashboard');
+      return;
+    }
+
+    // For now, use first package as the tool
+    const [toolId, , toolCategory] = packages[0];
+    
+    // Fetch full structure for the tool
+    const toolStructure = await invoke<any>('get_tool_structure', { toolId });
+    console.log('Loaded tool structure:', toolStructure);
+
+    // Map backend structure to frontend interface
+    testData.value = {
+      tool: {
+        id: toolStructure.tool.id,
+        name: toolStructure.tool.name,
+        description: toolStructure.tool.description || `${toolCategory} assessment tool`,
+        category: toolStructure.tool.category || toolCategory
+      },
+      subtests: toolStructure.subtests.map((s: any) => ({
+        id: s.subtest.id,
+        name: s.subtest.subtest_name,
+        description: `Subtest ${s.subtest.sequence_order} - ${s.subtest.subtest_name}`,
+        instructions: parseInstructions(s.subtest.instructions),
+        time_limit: s.subtest.time_limit_seconds || 300,
+        questions: s.questions.map((q: any) => ({
+          id: q.id,
+          text: q.question_text,
+          options: parseOptions(q.options)
+        }))
+      }))
+    };
+
+  } catch (e) {
+    console.error('Failed to load event packages:', e);
+    alert('Failed to load assessment. Please try again.');
+    router.push('/candidate/dashboard');
+  } finally {
+    isLoadingTest.value = false;
+  }
+}
+
+// Helper to parse instructions
+function parseInstructions(instr: any): string[] {
+    if (!instr) return ['Ikuti petunjuk dengan teliti'];
+    try {
+        if (Array.isArray(instr)) {
+            return instr.map(i => typeof i === 'string' ? i : JSON.stringify(i));
+        }
+        if (typeof instr === 'string') {
+            // Check if it looks like JSON
+            if (instr.trim().startsWith('[')) {
+                return JSON.parse(instr);
+            }
+            return [instr];
+        }
+        if (typeof instr === 'object') {
+            // If it's an object, try to extract values or stringify
+            // Common case: { "1": "instr 1", "2": "instr 2" } or similar
+            const values = Object.values(instr);
+            if (values.length > 0 && values.every(v => typeof v === 'string')) {
+                return values as string[];
+            }
+            return [JSON.stringify(instr)];
+        }
+        return [String(instr)];
+    } catch (e) {
+        return ['Instruction parse error'];
+    }
+}
+
+// Helper to parse options
+function parseOptions(opts: any): string[] {
+    if (!opts) return [];
+    try {
+        if (Array.isArray(opts)) return opts.map(o => String(o));
+        if (typeof opts === 'string') {
+             const parsed = JSON.parse(opts);
+             return Array.isArray(parsed) ? parsed : [];
+        }
+        if (typeof opts === 'object') {
+            return Object.values(opts).map(o => String(o));
+        }
+        return [];
+    } catch (e) {
+        console.error('Failed to parse options:', opts);
+        return [];
+    }
+}
 
 // Computed
-const currentSubtest = computed(() => testData.value.subtests[currentSubtestIndex.value]);
+const currentSubtest = computed(() => testData.value?.subtests[currentSubtestIndex.value]);
 const currentQuestion = computed(() => currentSubtest.value?.questions[currentQuestionIndex.value]);
 const totalQuestionsInSubtest = computed(() => currentSubtest.value?.questions.length || 0);
 const progressPercent = computed(() => {
@@ -115,32 +205,111 @@ function stopTimer() {
 const sessionId = ref(`session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
 // Navigation functions
+const dbSessionId = ref<number | null>(null);
+
+// Navigation functions
 async function startTest() {
   testPhase.value = 'instructions';
-  
-  // Start recording
-  const recordingStarted = await startRecording({
-    sessionId: sessionId.value,
-    userId: 1, // TODO: Get from auth store
-    username: 'Test User', // TODO: Get from auth store
-    testName: testData.value.tool.name,
+
+  // 1. Start recording expectation IMMEDIATELY to capture user gesture
+  // We don't await it yet to ensure the browser sees this as a direct response to the click
+  const recordingPromise = startRecording({
+    sessionId: sessionId.value, // Keep using string ID for file storage
+    userId: 1, 
+    username: 'Test User',
+    testName: testData.value?.tool.name || 'Unknown',
     eventName: undefined
   });
+  
+  // 2. Create DB Session for Report (Background)
+  try {
+      if (eventId.value) { 
+          // Parse user session
+          const sessionStr = localStorage.getItem('user_session');
+          let participantId = 'guest';
+          if (sessionStr) {
+             const s = JSON.parse(sessionStr);
+             participantId = s.username;
+          }
+
+          dbSessionId.value = await invoke('create_session', {
+             eventId: eventId.value,
+             participantId: participantId,
+             metadata: {
+                 userAgent: navigator.userAgent,
+                 testName: testData.value?.tool.name,
+                 recordingId: sessionId.value
+             }
+          });
+          console.log('Created DB Session:', dbSessionId.value);
+      }
+  } catch (e) {
+      console.error('Failed to create DB session:', e);
+  }
+
+  // 3. Resolve recording
+  const recordingStarted = await recordingPromise;
   
   if (!recordingStarted) {
     console.warn('Failed to start recording, but continuing with test');
   }
 }
 
-function startSubtest() {
-  testPhase.value = 'testing';
-  currentQuestionIndex.value = 0;
-  startTimer();
+async function finishTest() {
+
+    // 1. Stop Recording Explicitly
+    if (isRecording.value) {
+        // Parse user session for correct metadata
+        const sessionStr = localStorage.getItem('user_session');
+        let participantId = 'guest';
+        let userId = 1;
+        if (sessionStr) {
+           const s = JSON.parse(sessionStr);
+           participantId = s.username;
+           userId = s.id;
+        }
+
+        await stopRecording({
+            sessionId: sessionId.value,
+            userId: userId,
+            username: participantId,
+            testName: testData.value?.tool.name || 'Unknown',
+        });
+    }
+
+    // 2. Calculate Final Scores
+    const result = calculateScore();
+    const scores = {
+        total_score: result.answered, // simplified
+        raw_score: result.answered,
+        max_score: result.total,
+        details: answers.value
+    };
+
+    // 3. Submit to Backend
+    if (dbSessionId.value) {
+        try {
+            await invoke('submit_test_results', {
+                sessionId: dbSessionId.value,
+                scores: scores,
+                interpretations: null
+            });
+            console.log('Results submitted successfully');
+        } catch (e) {
+            console.error('Failed to submit results:', e);
+            alert('Failed to save results. Please contact admin.');
+        }
+    } else {
+        console.warn('No DB Session ID, results not saved to DB');
+    }
+
+    testPhase.value = 'completed';
 }
 
 function selectAnswer(questionId: number, answer: string) {
   answers.value[questionId] = answer;
   answeredQuestions.value.add(questionId);
+  // Optional: Auto-advance if single choice? No, let user confirm.
 }
 
 function nextQuestion() {
@@ -158,26 +327,33 @@ function prevQuestion() {
 }
 
 function goToQuestion(index: number) {
-  currentQuestionIndex.value = index;
+  if (index >= 0 && index < totalQuestionsInSubtest.value) {
+    currentQuestionIndex.value = index;
+  }
 }
 
 function finishSubtest() {
-  stopTimer();
-  testPhase.value = 'subtest-complete';
+    testPhase.value = 'subtest-complete';
+    stopTimer();
 }
 
 function nextSubtest() {
-  if (currentSubtestIndex.value < testData.value.subtests.length - 1) {
+  if (testData.value && currentSubtestIndex.value < testData.value.subtests.length - 1) {
     currentSubtestIndex.value++;
     currentQuestionIndex.value = 0;
     testPhase.value = 'subtest-intro';
   } else {
-    testPhase.value = 'completed';
+    finishTest(); 
   }
 }
 
 function continueToInstructions() {
   testPhase.value = 'subtest-intro';
+}
+
+function startSubtest() {
+  testPhase.value = 'testing';
+  startTimer();
 }
 
 async function resetTest() {
@@ -194,15 +370,32 @@ async function resetTest() {
   stopTimer();
 }
 
+function backToDashboard() {
+  router.push('/dashboard');
+}
+
 // Calculate score
 function calculateScore() {
-  // This would be calculated based on correct answers
-  // For now, return answered count
+  if (!testData.value) return { answered: 0, total: 0 };
   return {
     answered: answeredQuestions.value.size,
     total: testData.value.subtests.reduce((acc, s) => acc + s.questions.length, 0)
   };
 }
+
+// Lifecycle
+onMounted(() => {
+  eventId.value = Number(route.query.eventId);
+  
+  if (!eventId.value || isNaN(eventId.value)) {
+    console.error('No valid event ID provided');
+    alert('Invalid event. Please select an event from dashboard.');
+    router.push('/candidate/dashboard');
+    return;
+  }
+  
+  loadEventPackages();
+});
 
 onUnmounted(async () => {
   stopTimer();
@@ -215,9 +408,18 @@ onUnmounted(async () => {
 
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#0a0f1a] to-[#1a1f2e]">
+    
+    <!-- LOADING SCREEN -->
+    <div v-if="isLoadingTest || !testData" class="min-h-screen flex items-center justify-center p-4">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-cyan-500 border-t-transparent mb-4"></div>
+        <div class="text-white text-xl font-semibold">Loading assessment...</div>
+        <div class="text-white/60 text-sm mt-2">Please wait</div>
+      </div>
+    </div>
 
     <!-- WELCOME SCREEN -->
-    <div v-if="testPhase === 'welcome'" class="min-h-screen flex items-center justify-center p-4">
+    <div v-else-if="testPhase === 'welcome'" class="min-h-screen flex items-center justify-center p-4">
       <div class="max-w-2xl w-full">
         <!-- Header -->
         <div class="text-center mb-8">
@@ -458,7 +660,7 @@ onUnmounted(async () => {
                   : 'bg-white/5 border-white/10 text-white/70 hover:border-white/30 hover:bg-white/10'">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold"
                   :class="answers[currentQuestion!.id] === opt ? 'bg-cyan-500 text-white' : 'bg-white/10 text-white/60'">
-                  {{ String.fromCharCode(65 + optIdx) }}
+                  {{ String.fromCharCode(65 + (optIdx as number)) }}
                 </span>
                 <span class="flex-1 text-lg">{{ opt }}</span>
                 <svg v-if="answers[currentQuestion!.id] === opt" class="w-6 h-6 text-cyan-500" fill="currentColor"
@@ -515,7 +717,7 @@ onUnmounted(async () => {
 
           <div class="bg-white/5 rounded-xl p-4 mb-6">
             <div class="text-3xl font-bold text-cyan-400">
-              {{currentSubtest.questions.filter(q => answeredQuestions.has(q.id)).length}}/{{
+              {{currentSubtest.questions.filter((q: any) => answeredQuestions.has(q.id)).length}}/{{
                 currentSubtest.questions.length }}
             </div>
             <div class="text-sm text-white/50">Soal Dijawab</div>
@@ -571,11 +773,11 @@ onUnmounted(async () => {
               <div class="flex items-center gap-2">
                 <div class="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
                   <div class="h-full bg-green-500"
-                    :style="{ width: (subtest.questions.filter(q => answeredQuestions.has(q.id)).length / subtest.questions.length * 100) + '%' }">
+                  :style="{ width: (subtest.questions.filter((q: any) => answeredQuestions.has(q.id)).length / subtest.questions.length * 100) + '%' }">
                   </div>
                 </div>
                 <span class="text-xs text-white/50 w-12 text-right">
-                  {{subtest.questions.filter(q => answeredQuestions.has(q.id)).length}}/{{ subtest.questions.length }}
+                  {{subtest.questions.filter((q: any) => answeredQuestions.has(q.id)).length}}/{{ subtest.questions.length }}
                 </span>
               </div>
             </div>
@@ -588,10 +790,16 @@ onUnmounted(async () => {
             </p>
           </div>
 
-          <button @click="resetTest"
-            class="px-8 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-all">
-            Kembali ke Beranda
-          </button>
+          <div class="flex gap-4 justify-center">
+            <button @click="backToDashboard"
+              class="px-8 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold hover:from-cyan-400 transition-all">
+              ← Kembali ke Dashboard
+            </button>
+            <button @click="resetTest"
+              class="px-8 py-3 rounded-xl bg-white/10 text-white font-medium hover:bg-white/20 transition-all">
+              🔄 Ulang Tes
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onUnmounted, watch } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
 import { useRoute } from 'vue-router';
 
@@ -23,7 +23,12 @@ async function capture() {
     const frame: string = await invoke('capture_frame');
     frameData.value = frame;
   } catch (e) {
-    console.warn("Frame capture failed:", e);
+    // Expected error when browser is using the camera for test recording
+    // Only log in development mode to avoid console spam
+    if (import.meta.env.DEV && typeof e === 'string' && !e.includes('Camera busy')) {
+      console.warn("Frame capture failed:", e);
+    }
+    // Silently fail - this is normal during active test recording
   }
 }
 

@@ -28,15 +28,16 @@ const sizeClasses = {
     <Teleport to="body">
         <div 
             v-if="show" 
-            class="fixed z-[9999] inset-0 overflow-y-auto" 
+            class="fixed z-[99999] inset-0 overflow-y-auto" 
             aria-labelledby="modal-title" 
             role="dialog" 
             aria-modal="true"
+            style="z-index: 99999 !important;"
         >
-            <div class="flex items-end sm:items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="flex items-end sm:items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0 pointer-events-none">
                 <!-- Backdrop -->
                 <div 
-                    class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+                    class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity pointer-events-auto" 
                     aria-hidden="true" 
                     @click="emit('close')"
                 />
@@ -44,9 +45,10 @@ const sizeClasses = {
                 <!-- Modal Panel -->
                 <div 
                     :class="[
-                        'inline-block align-bottom glass-panel bg-eling-light-surface text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full border border-eling-emerald/20',
+                        'inline-block align-bottom glass-panel bg-eling-light-surface text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full border border-eling-emerald/20 pointer-events-auto',
                         sizeClasses[size]
                     ]"
+                    style="z-index: 100000 !important; position: relative;"
                 >
                     <!-- Header -->
                     <div class="flex justify-between items-center p-6 border-b border-black/10 dark:border-white/10">

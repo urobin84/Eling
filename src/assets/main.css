@@ -349,4 +349,9 @@
   .el-date-table td.disabled {
     opacity: 0.3;
   }
+
+  /* Ensure date picker popper appears above modals */
+  .el-picker__popper {
+    z-index: 9999 !important;
+  }
 }

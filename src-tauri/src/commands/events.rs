@@ -72,13 +72,24 @@ pub async fn remove_participant_from_event(
 }
 
 #[tauri::command]
+pub async fn reset_participant(
+    db: State<'_, Database>,
+    event_id: i64,
+    user_id: i64
+) -> Result<(), String> {
+    db.reset_participant_session(event_id, user_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub async fn get_my_events(
     db: State<'_, Database>,
     user_id: i64,
-) -> Result<Vec<Event>, String> {
+) -> Result<Vec<crate::db::models::CandidateEvent>, String> {
     db.get_user_events(user_id)
         .await
-        .map_err(|e| format!("Failed to get events: {}", e))
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -96,4 +107,15 @@ pub async fn generate_event_code_cmd(
         .map_err(|e| format!("Failed to update event: {}", e))?;
     
     Ok(code)
+}
+
+#[tauri::command]
+pub async fn delete_events(
+    db: State<'_, Database>,
+    event_ids: Vec<i64>,
+) -> Result<(), String> {
+    for id in event_ids {
+        db.delete_event(id).await.map_err(|e| e.to_string())?;
+    }
+    Ok(())
 }

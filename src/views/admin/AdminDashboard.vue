@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import AdminLayout from '@/components/templates/AdminLayout.vue';
 import BaseModal from '@/components/molecules/BaseModal.vue';
 import BaseButton from '@/components/atoms/BaseButton.vue';
@@ -53,7 +54,7 @@ const selectedEventId = ref<number | null>(null);
 // Fetch data
 async function fetchData() {
     try {
-        users.value = await invoke<User[]>('get_users');
+        users.value = await invoke<User[]>('get_all_users');
         events.value = await invoke<Event[]>('get_events');
         tools.value = await invoke<Tool[]>('get_tools');
     } catch (e) {
@@ -87,21 +88,75 @@ function closeEventDetailModal() {
     fetchData();
 }
 
+const isCreatingEvent = ref(false);
+
 async function handleCreateEvent(data: { name: string; date: string; description: string; toolIds: number[] }) {
+    console.log('handleCreateEvent called with data:', data);
+    
+    isCreatingEvent.value = true;
+    
     try {
-        await invoke('create_event', {
-            eventName: data.name,
+        console.log('Calling backend create_event command...');
+        
+        const result = await invoke('create_event', {
+            name: data.name,
             eventDate: data.date,
             description: data.description,
             toolIds: data.toolIds
         });
 
-        alert('Event created successfully!');
+        console.log('Backend response:', result);
+        
+        ElMessage({
+            message: 'Event created successfully!',
+            type: 'success',
+            duration: 3000
+        });
+        
         showCreateEventModal.value = false;
         await fetchData();
     } catch (e) {
         console.error('Create Event Error:', e);
-        alert('Failed to create event: ' + e);
+        
+        ElMessage({
+            message: `Failed to create event: ${e}`,
+            type: 'error',
+            duration: 5000
+        });
+    } finally {
+        isCreatingEvent.value = false;
+    }
+}
+
+const isDeleting = ref(false);
+
+async function deleteEvents(ids: number[]) {
+    try {
+        await ElMessageBox.confirm(
+            `Are you sure you want to delete ${ids.length} event(s)? This action cannot be undone.`,
+            'Confirm Deletion',
+            {
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                type: 'warning',
+            }
+        );
+
+        isDeleting.value = true;
+        await invoke('delete_events', { eventIds: ids });
+        
+        ElMessage.success(`Successfully deleted ${ids.length} event(s)`);
+        await fetchData();
+        // We need a way to tell ScheduleList to clear selection, but fetching data might be enough 
+        // if ScheduleList watches events or we rely on re-rendering. 
+        // For now, let's assume valid reactivity.
+    } catch (error) {
+        if (error !== 'cancel') {
+            console.error('Failed to delete events:', error);
+            ElMessage.error(`Failed to delete events: ${error}`);
+        }
+    } finally {
+        isDeleting.value = false;
     }
 }
 
@@ -208,7 +263,13 @@ onMounted(fetchData);
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-eling-dark-text">Assessment Schedule</h2>
                 <p class="text-sm text-gray-900 dark:text-eling-dark-text/50 mt-1">Manage testing sessions and timelines.</p>
             </div>
-            <ScheduleList :events="events" @create="showCreateEventModal = true" @viewDetails="viewEventDetails" />
+            <ScheduleList 
+                :events="events" 
+                :loading="isDeleting"
+                @create="showCreateEventModal = true" 
+                @viewDetails="viewEventDetails" 
+                @delete="deleteEvents" 
+            />
         </div>
 
         <!-- Test Results View -->

@@ -12,9 +12,9 @@ interface Event {
   event_name: string;
   description?: string;
   status: string;
-  event_code?: string;
   enrollment_deadline?: string;
   created_at: string;
+  participant_status?: string;
 }
 
 interface User {
@@ -73,7 +73,10 @@ async function handleJoinEvent(code: string) {
 
 function startAssessment(eventId: number) {
   console.log("Starting assessment for event:", eventId);
-  router.push('/test/run');
+  router.push({
+    path: '/test/run',
+    query: { eventId: eventId.toString() }
+  });
 }
 
 function logout() {

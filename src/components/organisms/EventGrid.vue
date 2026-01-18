@@ -9,6 +9,7 @@ interface Event {
   description?: string;
   status: string;
   created_at: string;
+  participant_status?: string;
 }
 
 defineProps<{

@@ -5,7 +5,7 @@ use std::fs;
 use std::str::FromStr;
 use bcrypt;
 
-mod db;
+pub mod db;
 mod commands;
 mod tests;
 mod recording;
@@ -94,13 +94,18 @@ pub fn run() {
             commands::auth::login_user,
             commands::auth::update_avatar,
             commands::auth::get_user_profile,
+            commands::events::reset_participant,
             commands::dashboard::get_all_users,
             commands::dashboard::get_events,
             commands::dashboard::create_event,
+            commands::dashboard::get_event_packages,
             commands::dashboard::create_candidate,
             commands::dashboard::get_my_sessions,
             commands::dashboard::get_test_results,
+            commands::dashboard::submit_test_results,
+            commands::dashboard::delete_test_results,
             commands::dashboard::generate_ai_review,
+            commands::dashboard::update_test_interpretation,
             commands::tools::get_tool_structure,
             commands::tools::create_subtest,
             commands::tools::delete_subtest,
@@ -121,6 +126,7 @@ pub fn run() {
             commands::events::remove_participant_from_event,
             commands::events::get_my_events,
             commands::events::generate_event_code_cmd,
+            commands::events::delete_events,
             surveillance::check_camera_permission,
             surveillance::capture_frame,
             surveillance::register_session,
@@ -137,6 +143,7 @@ pub fn run() {
             recording::get_all_recordings,
             recording::delete_session_recording,
             recording::get_recording_video_path,
+            recording::get_recording_data,
             recording::cleanup_old_recordings,
             // Server commands (Admin)
             commands::server::start_api_server,

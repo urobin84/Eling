@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Eling - Modular Psychotest Platform"
 authors = ["Robin"]
 edition = "2021"
+default-run = "eling"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -48,3 +49,5 @@ tempfile = "3.0"
 
 
 
+
+# Trigger rebuild

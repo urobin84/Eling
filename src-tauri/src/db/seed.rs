@@ -836,8 +836,8 @@ pub async fn seed_dummy_results(db: &Database) -> Result<(), Error> {
     }
 
     // 2. Create Dummy Events
-    let event1 = db.create_event("Batch 1 - Alpha", Some("Initial hiring batch".to_string())).await?;
-    let event2 = db.create_event("Batch 2 - Beta", Some("Secondary screening".to_string())).await?;
+    let event1 = db.create_event("Batch 1 - Alpha", Some("Initial hiring batch".to_string()), None).await?;
+    let event2 = db.create_event("Batch 2 - Beta", Some("Secondary screening".to_string()), None).await?;
 
     // 3. Create Sessions & Reports (Completed Tests)
     // We'll create random results for different tools

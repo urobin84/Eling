@@ -6,20 +6,35 @@ use serde_json::json;
 
 #[tauri::command]
 pub async fn generate_ai_review(db: State<'_, Database>, result_id: i64) -> Result<String, String> {
-    // 1. Fetch Report Data
-    let report = db.get_report_by_id(result_id).await.map_err(|e| e.to_string())?;
+    // 1. Fetch Detailed Report Data
+    let result = db.get_test_result_by_id(result_id).await.map_err(|e| e.to_string())?;
     
-    // 2. Fetch Context (Candidate Name, Tool, etc.) - We might need to join queries or just use what we have.
-    // get_report_by_id only gives raw report. We can use the scores JSON.
-    // For a better prompt, we'd ideally want candidate name and tool name, but report has session_id.
-    // Optimization: Just analyze the scores for now.
+    // 2. Extract context
+    let candidate_name = &result.candidate_name;
+    let tool_name = &result.tool_name;
+    let score = result.score;
+    let raw_score = result.raw_score;
+    let percentile = result.percentile.unwrap_or(0);
     
-    let scores = &report.scores;
-    
-    // Construct Prompt
+    // Construct Enhanced Psychometric Prompt
     let prompt = format!(
-        "You are an expert psychological assessment assistant. Analyze the following test scores and provide a concise, professional interpretation for the candidate. Focus on strengths and areas for development.\n\nScores: {}\n\nInterpretation:",
-        scores
+        "You are an expert psychometrician and psychological assessment assistant. \
+        Analyze the following test results and provide a professional, encouraging, and insightful interpretation. \
+        Avoid technical jargon where possible, and focus on practical implications.
+
+Candidate Name: {}
+Assessment Tool: {}
+Final Score: {}
+Raw Score: {}
+Percentile: {}%
+
+Please provide the interpretation in a structured way:
+1. Executive Summary
+2. Strengths
+3. Areas for Development
+
+Interpretation:",
+        candidate_name, tool_name, score, raw_score, percentile
     );
 
     // 3. Call Ollama (gemma2:2b)
@@ -28,11 +43,15 @@ pub async fn generate_ai_review(db: State<'_, Database>, result_id: i64) -> Resu
         .json(&json!({
             "model": "gemma2:2b",
             "prompt": prompt,
-            "stream": false
+            "stream": false,
+            "options": {
+                "temperature": 0.7,
+                "top_p": 0.9
+            }
         }))
         .send()
         .await
-        .map_err(|e| format!("Failed to connect to AI engine: {}", e))?;
+        .map_err(|e| format!("Failed to connect to AI engine (Ollama): {}. Please ensure Ollama is running.", e))?;
         
     if !res.status().is_success() {
         return Err(format!("AI Engine returned error: {}", res.status()));
@@ -45,6 +64,17 @@ pub async fn generate_ai_review(db: State<'_, Database>, result_id: i64) -> Resu
     db.update_report_ai_review(result_id, &review).await.map_err(|e| e.to_string())?;
 
     Ok(review)
+}
+
+#[tauri::command]
+pub async fn update_test_interpretation(
+    db: State<'_, Database>,
+    result_id: i64,
+    interpretation: String
+) -> Result<(), String> {
+    db.update_report_ai_review(result_id, &interpretation)
+        .await
+        .map_err(|e| e.to_string())
 }
 #[tauri::command]
 pub async fn get_all_users(db: State<'_, Database>) -> Result<Vec<User>, String> {
@@ -60,9 +90,55 @@ pub async fn get_events(db: State<'_, Database>) -> Result<Vec<Event>, String> {
 pub async fn create_event(
     db: State<'_, Database>, 
     name: String, 
-    description: Option<String>
+    description: Option<String>,
+    event_date: Option<String>,
+    tool_ids: Option<Vec<i64>>
 ) -> Result<i64, String> {
-    db.create_event(&name, description)
+    println!("DEBUG: create_event called. Name: {}, Description: {:?}, Date: {:?}, Tools: {:?}", name, description, event_date, tool_ids);
+    
+    // Create the event
+    let event_id = db.create_event(&name, description, event_date)
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    println!("DEBUG: Created event id: {}", event_id);
+
+    // Generate and set event code
+    let event_code = db.generate_event_code()
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    db.update_event_code(event_id, &event_code)
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    // Associate tools with the event if provided
+    if let Some(tools) = tool_ids {
+        println!("DEBUG: tool_ids is Some. Length: {}", tools.len());
+        if !tools.is_empty() {
+            println!("DEBUG: Processing tool ids: {:?}", tools);
+            db.add_tools_to_event(event_id, tools)
+                .await
+                .map_err(|e| {
+                    println!("DEBUG: ERROR in add_tools_to_event: {}", e);
+                    e.to_string()
+                })?;
+        } else {
+            println!("DEBUG: tool_ids is Some but empty vector");
+        }
+    } else {
+        println!("DEBUG: tool_ids is None");
+    }
+    
+    Ok(event_id)
+}
+
+#[tauri::command]
+pub async fn get_event_packages(
+    db: State<'_, Database>,
+    event_id: i64,
+) -> Result<Vec<(i64, String, String)>, String> {
+    db.get_event_packages(event_id)
         .await
         .map_err(|e| e.to_string())
 }
@@ -98,4 +174,28 @@ pub async fn create_candidate(
 #[tauri::command]
 pub async fn get_test_results(db: State<'_, Database>) -> Result<Vec<crate::db::models::TestResultDTO>, String> {
     db.get_all_test_results().await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn submit_test_results(
+    db: State<'_, Database>,
+    session_id: i64,
+    scores: serde_json::Value,
+    interpretations: Option<serde_json::Value>
+) -> Result<i64, String> {
+    println!("DEBUG: Submitting test results for session {}", session_id);
+    let inter = interpretations.unwrap_or(json!({}));
+    db.create_report(session_id, scores, inter)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_test_results(
+    db: State<'_, Database>,
+    result_ids: Vec<i64>
+) -> Result<(), String> {
+    db.delete_test_results(result_ids)
+        .await
+        .map_err(|e| e.to_string())
 }

@@ -40,29 +40,61 @@ pub fn check_camera_permission() -> bool {
 
 #[tauri::command]
 pub async fn capture_frame() -> Result<String, String> {
+    // Try to access camera, but fail gracefully if busy (e.g., browser is using it)
     let index = CameraIndex::Index(0);
     let requested = RequestedFormat::new::<RgbFormat>(RequestedFormatType::AbsoluteHighestFrameRate);
 
-    let mut camera = Camera::new(index, requested).map_err(|e| e.to_string())?;
-    camera.open_stream().map_err(|e| e.to_string())?;
+    let mut camera = match Camera::new(index, requested) {
+        Ok(cam) => cam,
+        Err(e) => {
+            // Camera is likely in use by browser - this is expected during tests
+            return Err(format!("Camera busy or unavailable: {}", e));
+        }
+    };
     
-    let frame = camera.frame().map_err(|e| e.to_string())?;
-    camera.stop_stream().map_err(|e| e.to_string())?; 
+    if let Err(e) = camera.open_stream() {
+        return Err(format!("Cannot open camera stream (likely in use): {}", e));
+    }
+    
+    let frame = match camera.frame() {
+        Ok(f) => f,
+        Err(e) => {
+            let _ = camera.stop_stream(); // Clean up
+            return Err(format!("Cannot capture frame: {}", e));
+        }
+    };
+    
+    let _ = camera.stop_stream(); // Always clean up
 
-    // Manually construct ImageBuffer using image 0.24 to avoid version conflict with nokhwa's image 0.25
+    // Get the actual frame format and data
     let width = frame.resolution().width_x;
     let height = frame.resolution().height_y;
-    let raw_data = frame.buffer().to_vec();
+    
+    // Use nokhwa's built-in decoder to convert to RGB
+    // This handles whatever format the camera provides (YUV, YUYV, etc.)
+    let decoded = frame.decode_image::<RgbFormat>()
+        .map_err(|e| format!("Failed to decode camera frame: {}", e))?;
+    
+    // Now we have proper RGB data
+    let rgb_data = decoded.into_raw();
+    
+    // Validate RGB buffer size
+    let expected_size = (width * height * 3) as usize;
+    if rgb_data.len() != expected_size {
+        return Err(format!(
+            "RGB buffer size mismatch: expected {} bytes ({}x{}x3), got {} bytes",
+            expected_size, width, height, rgb_data.len()
+        ));
+    }
 
-    let buffer: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::from_raw(width, height, raw_data)
-        .ok_or("Failed to create image buffer")?;
+    let buffer: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::from_raw(width, height, rgb_data)
+        .ok_or_else(|| format!("Failed to create image buffer ({}x{} RGB)", width, height))?;
 
     let mut image_data = Vec::new();
     let mut cursor = Cursor::new(&mut image_data);
     
-    // image 0.24 uses ImageOutputFormat
     buffer.write_to(&mut cursor, ImageOutputFormat::Jpeg(80))
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| format!("JPEG encoding failed: {}", e))?;
 
     let base64_string = general_purpose::STANDARD.encode(&image_data);
     

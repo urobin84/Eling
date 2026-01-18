@@ -14,6 +14,12 @@ interface EventDetails {
     participant_count: number;
 }
 
+interface Tool {
+    id: number;
+    name: string;
+    category: string;
+}
+
 interface Participant {
     user_id: number;
     username: string;
@@ -40,6 +46,7 @@ const emit = defineEmits(['close', 'refresh']);
 // State
 const eventDetails = ref<EventDetails | null>(null);
 const participants = ref<Participant[]>([]);
+const tools = ref<Tool[]>([]);
 const isLoading = ref(true);
 const activeTab = ref<'overview' | 'participants'>('overview');
 const showAddParticipant = ref(false);
@@ -71,6 +78,18 @@ const statusColor = (status: string) => {
 };
 
 // Methods
+async function fetchTools() {
+    try {
+        const result = await invoke<[number, string, string][]>('get_event_packages', {
+            eventId: props.eventId
+        });
+        // Map tuple to object
+        tools.value = result.map(([id, name, category]) => ({ id, name, category }));
+    } catch (error) {
+        console.error('Failed to fetch tools:', error);
+    }
+}
+
 async function fetchEventDetails() {
     try {
         isLoading.value = true;
@@ -167,6 +186,25 @@ async function removeParticipant(userId: number, username: string) {
     }
 }
 
+async function resetParticipant(userId: number, username: string) {
+    if (!confirm(`Warning: This will DELETE all test results and recordings for ${username}. They will be able to start the test again. Continue?`)) return;
+
+    try {
+        await invoke('reset_participant', {
+            eventId: props.eventId,
+            userId: userId
+        });
+
+        alert(`Successfully reset status for ${username}`);
+        await fetchParticipants();
+        await fetchEventDetails();
+        emit('refresh');
+    } catch (error) {
+        console.error('Failed to reset participant:', error);
+        alert('Failed to reset participant.');
+    }
+}
+
 function copyEventCode() {
     if (eventDetails.value?.event_code) {
         navigator.clipboard.writeText(eventDetails.value.event_code);
@@ -177,6 +215,7 @@ function copyEventCode() {
 onMounted(() => {
     fetchEventDetails();
     fetchParticipants();
+    fetchTools();
 });
 </script>
 
@@ -252,6 +291,27 @@ onMounted(() => {
                                 class="px-6 py-3 bg-eling-emerald text-eling-dark rounded-lg hover:bg-eling-emerald/90 transition-all font-medium disabled:opacity-50">
                                 {{ generatingCode ? 'Generating...' : '🔑 Generate Code' }}
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Tools Section -->
+                    <div class="bg-black/5 dark:bg-white/5 rounded-xl p-6 border border-black/10 dark:border-white/10">
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-eling-dark-text mb-4 flex items-center gap-2">
+                            <span>🛠️ Selected Tools</span>
+                            <span class="text-xs font-normal text-gray-500 bg-black/5 px-2 py-0.5 rounded-full">{{ tools.length }}</span>
+                        </h3>
+                        <div v-if="tools.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div v-for="tool in tools" :key="tool.id" 
+                                class="flex items-center gap-3 p-3 bg-white dark:bg-eling-dark rounded-lg border border-black/10 dark:border-white/10 text-sm">
+                                <span class="w-2 h-2 rounded-full bg-eling-emerald"></span>
+                                <div class="flex-1">
+                                    <div class="font-medium text-gray-900 dark:text-eling-dark-text">{{ tool.name }}</div>
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-wider">{{ tool.category }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="text-center py-4 text-sm text-gray-500 italic">
+                            No tools selected for this assessment.
                         </div>
                     </div>
 
@@ -344,13 +404,45 @@ onMounted(() => {
                                     Enrolled: {{ new Date(participant.enrolled_at).toLocaleDateString() }}
                                 </div>
                             </div>
-                            <div class="flex items-center gap-3">
+// ... (in script)
+async function resetParticipant(userId: number, username: string) {
+    if (!confirm(`Warning: This will DELETE all test results and recordings for ${username}. They will be able to start the test again. Continue?`)) return;
+
+    try {
+        await invoke('reset_participant', {
+            eventId: props.eventId,
+            userId: userId
+        });
+
+        alert(`Successfully reset status for ${username}`);
+        await fetchParticipants();
+        await fetchEventDetails();
+        emit('refresh');
+    } catch (error) {
+        console.error('Failed to reset participant:', error);
+        alert('Failed to reset participant.');
+    }
+}
+// ... (in template)
+                            <div class="flex items-center gap-2">
                                 <span class="px-2 py-1 rounded text-xs font-medium border"
                                     :class="statusColor(participant.status)">
                                     {{ participant.status }}
                                 </span>
+                                
+                                <!-- Reset Button -->
+                                <button v-if="participant.status !== 'enrolled'" 
+                                    @click="resetParticipant(participant.user_id, participant.username)"
+                                    class="p-2 text-yellow-400 hover:bg-yellow-500/10 rounded-lg transition-all"
+                                    title="Reset Progress">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                </button>
+
                                 <button @click="removeParticipant(participant.user_id, participant.username)"
-                                    class="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
+                                    class="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                                    title="Remove Participant">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

@@ -1,0 +1,14 @@
+{
+  "session_id": "session-1768696155097-9tgg9fgpo",
+  "user_id": 1,
+  "username": "Test User",
+  "test_name": "TIU",
+  "event_name": null,
+  "started_at": 1768696159,
+  "ended_at": 1768696185,
+  "duration": 26,
+  "camera_file": "camera.webm",
+  "screen_file": "screen.webm",
+  "camera_size": 0,
+  "screen_size": 0
+}

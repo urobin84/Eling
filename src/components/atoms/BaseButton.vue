@@ -15,6 +15,10 @@ const props = withDefaults(defineProps<Props>(), {
     type: 'button'
 });
 
+const emit = defineEmits<{
+    click: [event: MouseEvent];
+}>();
+
 const buttonClasses = computed(() => {
     const base = 'btn-neumorphic font-bold whitespace-nowrap transition-all flex items-center justify-center gap-2';
     
@@ -39,6 +43,7 @@ const buttonClasses = computed(() => {
         :class="buttonClasses"
         :disabled="disabled"
         :type="type"
+        @click="emit('click', $event)"
     >
         <slot />
     </button>

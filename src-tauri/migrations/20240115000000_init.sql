@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS tools (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     tool_type TEXT NOT NULL CHECK(tool_type IN ('choice', 'pair', 'speed', 'projective', 'leadership')),
-    category TEXT NOT NULL CHECK(category IN ('cognitive', 'personality', 'performance', 'clinical')),
+    category TEXT NOT NULL CHECK(category IN ('cognitive', 'personality', 'performance', 'clinical', 'leadership', 'interest')),
     config JSON NOT NULL DEFAULT '{}',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
